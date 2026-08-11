@@ -86,7 +86,7 @@ struct AIRegionProfile: Equatable {
             .first { Self.regulatoryModels[$0] != nil }
         let storedProductType = cacheExtra["0+nc/Udy4WNG8S+Q7a/s1A"] as? String
         let productType = storedProductType ?? Self.machineIdentifier
-        if let profile = Self.productTypes[productType] {
+        if let profile = Self.profile(forProductType: productType) {
             self = profile
             return
         }
@@ -97,6 +97,18 @@ struct AIRegionProfile: Equatable {
         }
         self.marketingName = marketingName
         self.regulatoryModel = regulatoryModel
+    }
+
+    private static func profile(forProductType productType: String) -> AIRegionProfile? {
+        if let profile = productTypes[productType] {
+            return profile
+        }
+
+        // MobileGestalt can append a board/configuration suffix (for example,
+        // "iPad16,3-A"). The device family identifier before the suffix is the
+        // stable value used by the model map.
+        guard let separator = productType.firstIndex(of: "-") else { return nil }
+        return productTypes[String(productType[..<separator])]
     }
 
     private static var machineIdentifier: String {
