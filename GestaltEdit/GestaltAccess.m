@@ -2,7 +2,7 @@
 //  GestaltAccess.m
 //  GestaltEdit
 //
-//  Routes (from the FilzaSlop / Geod-MCM / MobileHouseArrest PoCs):
+//  Routes (from the FilzaSlop / bad_query / MobileHouseArrest PoCs):
 //
 //  1. SystemGroup class 13 (iOS 27 style):
 //       class 13, group "systemgroup.com.apple.mobilegestaltcache",
@@ -10,11 +10,9 @@
 //     -> /private/var/containers/Shared/SystemGroup/
 //          systemgroup.com.apple.mobilegestaltcache/Library/Caches
 //
-//  2. geod traversal (iOS 26 / 27):
-//       class 12, "com.apple.geod", part 3, partDomain
-//       "../../../../../../containers/Shared/SystemGroup/
-//        systemgroup.com.apple.mobilegestaltcache/Library/Caches",
-//       flags 0x8100000000
+//  2. bad_query path traversal (iOS 26 / 27):
+//       class 13, MobileGestalt SystemGroup, part 3, target absolute path,
+//       flags 0x8000000000; directly consumes the sandbox token
 //
 //  3. SystemGroup class 13 legacy (older OS without the part API):
 //       class 13, group identifier, part 0, flags 0x900000000
@@ -24,6 +22,7 @@
 //  MobileHouseArrest identity on iOS 27 beta 4.
 
 #import "GestaltAccess.h"
+#import "BadQueryBridge.h"
 #import "MCMBridge.h"
 
 #import <errno.h>
@@ -38,12 +37,13 @@ NSString * const GestaltPlistFileName = @"com.apple.MobileGestalt.plist";
 static const uint64_t kMCMFlags = 0x900000000ULL;
 static const uint64_t kMCMReadWritePartFlags = 0x8100000000ULL;
 static const uint64_t kMCMClassSystemGroups = 13;
-static const uint64_t kMCMClassSystemData = 12;
 static NSString * const kMobileGestaltSystemGroup =
     @"systemgroup.com.apple.mobilegestaltcache";
-static NSString * const kGeodIdentifier = @"com.apple.geod";
-static NSString * const kGeodTraversalPartDomain =
-    @"../../../../../../containers/Shared/SystemGroup/"
+static NSString * const kMobileGestaltCacheDirectory =
+    @"/private/var/containers/Shared/SystemGroup/"
+     "systemgroup.com.apple.mobilegestaltcache/Library/Caches";
+static NSString * const kBadQueryMobileGestaltCacheDirectory =
+    @"/var/containers/Shared/SystemGroup/"
      "systemgroup.com.apple.mobilegestaltcache/Library/Caches";
 
 static NSError *GestaltError(NSInteger code, NSString *message)
@@ -192,6 +192,7 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
 @implementation GestaltAccess
 {
     MCMLease *_activeLease;
+    BadQueryLease *_activeBadQueryLease;
 }
 
 + (instancetype)shared
@@ -221,6 +222,7 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
 {
     NSOperatingSystemVersion version = NSProcessInfo.processInfo.operatingSystemVersion;
     NSString *build = self.currentOSBuild;
+
     return version.majorVersion == 27 && (
         [build isEqualToString:@"24A5355q"] || // iOS 27 beta 1
         [build isEqualToString:@"24A5370h"] || // iOS 27 beta 2
@@ -244,13 +246,13 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
         return NO;
     }
 
-    if (self.isConnected && _activeLease.activated &&
-        self.cacheDirectoryPath.length > 0) {
+    BOOL leaseActive = _activeLease.activated || _activeBadQueryLease.isActive;
+    if (self.isConnected && leaseActive && self.cacheDirectoryPath.length > 0) {
         if (error) *error = nil;
         return YES;
     }
 
-    if (!MCMBridgeAvailable()) {
+    if (!MCMBridgeAvailable() && !BadQueryBridgeAvailable()) {
         if (error) *error = GestaltError(1, NSLocalizedString(
             @"ContainerManager bridge is unavailable (the iOS version is too old or libsystem_containermanager is missing).", nil));
         return NO;
@@ -258,19 +260,39 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
 
     [_activeLease invalidate];
     _activeLease = nil;
+    [_activeBadQueryLease invalidate];
+    _activeBadQueryLease = nil;
     self.isConnected = NO;
     self.activeRoute = GestaltRouteNone;
     self.routeDescription = @"";
     self.cacheDirectoryPath = nil;
     self.plistPath = nil;
 
+    NSString *badQueryTarget = [kBadQueryMobileGestaltCacheDirectory
+        stringByAppendingPathComponent:GestaltPlistFileName];
+    NSString *badQueryPlist = [kMobileGestaltCacheDirectory
+        stringByAppendingPathComponent:GestaltPlistFileName];
+    NSString *badQueryDetail = nil;
+    BadQueryLease *badQueryLease = [BadQueryLease leaseForPath:badQueryTarget
+                                                        error:&badQueryDetail];
+    if (badQueryLease && GestaltCanOpenReadWrite(badQueryPlist)) {
+        _activeBadQueryLease = badQueryLease;
+        self.isConnected = YES;
+        self.activeRoute = GestaltRouteBadQuery;
+        self.routeDescription = @"bad-query";
+        self.cacheDirectoryPath = kMobileGestaltCacheDirectory;
+        self.plistPath = badQueryPlist;
+        if (error) *error = nil;
+        return YES;
+    }
+    [badQueryLease invalidate];
+    NSLog(@"[GestaltAccess] route bad-query failed: %@",
+          badQueryDetail ?: @"target plist is not writable");
+
     NSArray<NSArray *> *routes = @[
         @[ @"systemgroup-class13-part3",
            @(kMCMClassSystemGroups), kMobileGestaltSystemGroup, @YES,
            @3, NSNull.null, @(kMCMReadWritePartFlags) ],
-        @[ @"geod-traversal",
-           @(kMCMClassSystemData), kGeodIdentifier, @NO,
-           @3, kGeodTraversalPartDomain, @(kMCMReadWritePartFlags) ],
         @[ @"systemgroup-class13-legacy",
            @(kMCMClassSystemGroups), kMobileGestaltSystemGroup, @YES,
            @0, NSNull.null, @(kMCMFlags) ],
@@ -328,11 +350,9 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
 
         _activeLease = lease;
         self.isConnected = YES;
-        self.activeRoute = [name isEqualToString:@"geod-traversal"]
-            ? GestaltRouteGeodTraversal
-            : ([name isEqualToString:@"systemgroup-class13-legacy"]
-                ? GestaltRouteSystemGroupLegacy
-                : GestaltRouteSystemGroupClass13);
+        self.activeRoute = [name isEqualToString:@"systemgroup-class13-legacy"]
+            ? GestaltRouteSystemGroupLegacy
+            : GestaltRouteSystemGroupClass13;
         self.routeDescription = name;
         self.cacheDirectoryPath = cachesDir;
         self.plistPath = plist;
@@ -341,7 +361,7 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
     }
 
     if (error) *error = GestaltError(2, NSLocalizedString(
-        @"All ContainerManager routes failed. This system does not expose read/write access to the MobileGestalt cache directory. The iOS 26 route uses geod traversal, while some iOS 27 builds use direct class-13 access. Some systems require the com.apple.mobile.MobileHouseArrest bundle identifier.", nil));
+        @"All ContainerManager routes failed. This system does not expose read/write access to the MobileGestalt cache directory. The path-based bad_query route and the direct class-13 routes were rejected.", nil));
     return NO;
 }
 

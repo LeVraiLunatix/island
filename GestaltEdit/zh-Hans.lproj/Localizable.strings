@@ -147,7 +147,7 @@
 "CacheData marker validation failed. No changes were made." = "CacheData 标记验证失败，未进行任何更改。";
 
 "ContainerManager bridge is unavailable (the iOS version is too old or libsystem_containermanager is missing)." = "ContainerManager 桥接不可用（iOS 版本过旧或缺少 libsystem_containermanager）。";
-"All ContainerManager routes failed. This system does not expose read/write access to the MobileGestalt cache directory. The iOS 26 route uses geod traversal, while some iOS 27 builds use direct class-13 access. Some systems require the com.apple.mobile.MobileHouseArrest bundle identifier." = "所有 ContainerManager 路径均失败。此系统未开放 MobileGestalt 缓存目录的读写权限。iOS 26 路径使用 geod 穿越，部分 iOS 27 版本使用 class-13 直接访问。某些系统需要 com.apple.mobile.MobileHouseArrest 包标识符。";
+"All ContainerManager routes failed. This system does not expose read/write access to the MobileGestalt cache directory. The path-based bad_query route and the direct class-13 routes were rejected." = "所有 ContainerManager 路径均失败。此系统未开放 MobileGestalt 缓存目录的读写权限。基于路径的 bad_query 路径和 class-13 直接路径均被拒绝。";
 "The plist does not exist: %@" = "plist 不存在：%@";
 "Failed to read the plist." = "读取 plist 失败。";
 "The plist top level is not a dictionary." = "plist 顶层不是字典。";

@@ -90,6 +90,7 @@ Do not use a normal shutdown/restart. The old cache may overwrite the modified f
 
 - [Nugget](https://github.com/leminlimez/Nugget) — MobileGestalt presets and the iPadOS `CacheData` approach
 - [FilzaSlop](https://github.com/0xjohnnydev/FilzaSlop) — ContainerManager file-access research
+- [bad_query](https://github.com/forcequitOS/bad_query) — path-based ContainerManager sandbox escape
 - [0xJohnny](https://x.com/0xjohnny) — MobileHouseArrest / ContainerManager proof of concept
 
 GestaltEdit is an independent implementation and is not affiliated with Apple or the projects listed above.

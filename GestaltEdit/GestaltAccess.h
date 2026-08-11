@@ -4,7 +4,7 @@
 //
 //  High-level service that acquires a read/write sandbox extension for the
 //  MobileGestalt cache directory through the ContainerManager routes
-//  described in the FilzaSlop / Geod-MCM / MobileHouseArrest PoCs, then
+//  described in the FilzaSlop / bad_query / MobileHouseArrest PoCs, then
 //  reads, edits, saves and backs up com.apple.MobileGestalt.plist.
 //
 
@@ -16,7 +16,7 @@ typedef NS_ENUM(NSInteger, GestaltRoute) {
     GestaltRouteNone = 0,
     GestaltRouteSystemGroupClass13,   // class 13 + part 3 + read/write flags
     GestaltRouteSystemGroupLegacy,    // class 13, part 0 (older OS)
-    GestaltRouteGeodTraversal         // class 12 geod + part-domain traversal
+    GestaltRouteBadQuery              // bad_query path-based sandbox extension
 };
 
 extern NSString * const GestaltPlistFileName;
