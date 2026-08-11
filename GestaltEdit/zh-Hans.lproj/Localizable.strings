@@ -130,7 +130,7 @@
 "The backup is not a valid MobileGestalt plist." = "该备份不是有效的 MobileGestalt plist。";
 "The MobileGestalt values after writing do not match the expected values." = "写入后的 MobileGestalt 值与预期不一致。";
 "The device model name cannot be empty." = "设备型号名称不能为空。";
-"A supported iPhone 15 Pro or later model could not be identified." = "无法识别受支持的 iPhone 15 Pro 或更新机型。";
+"A supported Apple Intelligence iPhone or iPad model could not be identified." = "无法识别支持 Apple Intelligence 的 iPhone 或 iPad 机型。";
 
 "MobileGestalt is missing the ArtworkDevice dictionary, so Dynamic Island or model name cannot be changed." = "MobileGestalt 缺少 ArtworkDevice 字典，因此无法修改灵动岛或型号名称。";
 "MobileGestalt is missing CacheData, so iPadOS mode cannot be enabled." = "MobileGestalt 缺少 CacheData，因此无法启用 iPadOS 模式。";

@@ -5,6 +5,11 @@ struct AIRegionProfile: Equatable {
     let marketingName: String
     let regulatoryModel: String
 
+    private init(marketingName: String, regulatoryModel: String) {
+        self.marketingName = marketingName
+        self.regulatoryModel = regulatoryModel
+    }
+
     private static let regulatoryModels: [String: String] = [
         "iPhone 17e": "A3575",
         "iPhone 17 Pro Max": "A3257",
@@ -20,14 +25,53 @@ struct AIRegionProfile: Equatable {
         "iPhone 15 Pro": "A2848"
     ]
 
-    private static let productTypes: [String: String] = [
-        "iPhone16,1": "iPhone 15 Pro",
-        "iPhone16,2": "iPhone 15 Pro Max",
-        "iPhone17,1": "iPhone 16 Pro",
-        "iPhone17,2": "iPhone 16 Pro Max",
-        "iPhone17,3": "iPhone 16",
-        "iPhone17,4": "iPhone 16 Plus",
-        "iPhone17,5": "iPhone 16e"
+    private static let productTypes: [String: AIRegionProfile] = [
+        "iPhone16,1": .init(marketingName: "iPhone 15 Pro", regulatoryModel: "A2848"),
+        "iPhone16,2": .init(marketingName: "iPhone 15 Pro Max", regulatoryModel: "A2849"),
+        "iPhone17,1": .init(marketingName: "iPhone 16 Pro", regulatoryModel: "A3083"),
+        "iPhone17,2": .init(marketingName: "iPhone 16 Pro Max", regulatoryModel: "A3084"),
+        "iPhone17,3": .init(marketingName: "iPhone 16", regulatoryModel: "A3081"),
+        "iPhone17,4": .init(marketingName: "iPhone 16 Plus", regulatoryModel: "A3082"),
+        "iPhone17,5": .init(marketingName: "iPhone 16e", regulatoryModel: "A3212"),
+
+        // Apple Intelligence iPads. Cellular variants map to their US
+        // equivalent, including devices sold originally in mainland China.
+        "iPad13,4": .init(marketingName: "iPad Pro 11-inch (M1)", regulatoryModel: "A2377"),
+        "iPad13,5": .init(marketingName: "iPad Pro 11-inch (M1)", regulatoryModel: "A2459"),
+        "iPad13,6": .init(marketingName: "iPad Pro 11-inch (M1)", regulatoryModel: "A2301"),
+        "iPad13,7": .init(marketingName: "iPad Pro 11-inch (M1)", regulatoryModel: "A2301"),
+        "iPad13,8": .init(marketingName: "iPad Pro 12.9-inch (M1)", regulatoryModel: "A2378"),
+        "iPad13,9": .init(marketingName: "iPad Pro 12.9-inch (M1)", regulatoryModel: "A2461"),
+        "iPad13,10": .init(marketingName: "iPad Pro 12.9-inch (M1)", regulatoryModel: "A2379"),
+        "iPad13,11": .init(marketingName: "iPad Pro 12.9-inch (M1)", regulatoryModel: "A2379"),
+        "iPad13,16": .init(marketingName: "iPad Air (M1)", regulatoryModel: "A2588"),
+        "iPad13,17": .init(marketingName: "iPad Air (M1)", regulatoryModel: "A2589"),
+        "iPad14,3": .init(marketingName: "iPad Pro 11-inch (M2)", regulatoryModel: "A2759"),
+        "iPad14,4": .init(marketingName: "iPad Pro 11-inch (M2)", regulatoryModel: "A2435"),
+        "iPad14,5": .init(marketingName: "iPad Pro 12.9-inch (M2)", regulatoryModel: "A2436"),
+        "iPad14,6": .init(marketingName: "iPad Pro 12.9-inch (M2)", regulatoryModel: "A2764"),
+        "iPad14,8": .init(marketingName: "iPad Air 11-inch (M2)", regulatoryModel: "A2902"),
+        "iPad14,9": .init(marketingName: "iPad Air 11-inch (M2)", regulatoryModel: "A2903"),
+        "iPad14,10": .init(marketingName: "iPad Air 13-inch (M2)", regulatoryModel: "A2898"),
+        "iPad14,11": .init(marketingName: "iPad Air 13-inch (M2)", regulatoryModel: "A2899"),
+        "iPad15,3": .init(marketingName: "iPad Air 11-inch (M3)", regulatoryModel: "A3266"),
+        "iPad15,4": .init(marketingName: "iPad Air 11-inch (M3)", regulatoryModel: "A3267"),
+        "iPad15,5": .init(marketingName: "iPad Air 13-inch (M3)", regulatoryModel: "A3268"),
+        "iPad15,6": .init(marketingName: "iPad Air 13-inch (M3)", regulatoryModel: "A3269"),
+        "iPad16,1": .init(marketingName: "iPad mini (A17 Pro)", regulatoryModel: "A2993"),
+        "iPad16,2": .init(marketingName: "iPad mini (A17 Pro)", regulatoryModel: "A2995"),
+        "iPad16,3": .init(marketingName: "iPad Pro 11-inch (M4)", regulatoryModel: "A2836"),
+        "iPad16,4": .init(marketingName: "iPad Pro 11-inch (M4)", regulatoryModel: "A2837"),
+        "iPad16,5": .init(marketingName: "iPad Pro 13-inch (M4)", regulatoryModel: "A2925"),
+        "iPad16,6": .init(marketingName: "iPad Pro 13-inch (M4)", regulatoryModel: "A2926"),
+        "iPad16,8": .init(marketingName: "iPad Air 11-inch (M4)", regulatoryModel: "A3459"),
+        "iPad16,9": .init(marketingName: "iPad Air 11-inch (M4)", regulatoryModel: "A3460"),
+        "iPad16,10": .init(marketingName: "iPad Air 13-inch (M4)", regulatoryModel: "A3461"),
+        "iPad16,11": .init(marketingName: "iPad Air 13-inch (M4)", regulatoryModel: "A3462"),
+        "iPad17,1": .init(marketingName: "iPad Pro 11-inch (M5)", regulatoryModel: "A3357"),
+        "iPad17,2": .init(marketingName: "iPad Pro 11-inch (M5)", regulatoryModel: "A3358"),
+        "iPad17,3": .init(marketingName: "iPad Pro 13-inch (M5)", regulatoryModel: "A3360"),
+        "iPad17,4": .init(marketingName: "iPad Pro 13-inch (M5)", regulatoryModel: "A3361")
     ]
 
     init?(plist: GestaltPlist) {
@@ -42,9 +86,12 @@ struct AIRegionProfile: Equatable {
             .first { Self.regulatoryModels[$0] != nil }
         let storedProductType = cacheExtra["0+nc/Udy4WNG8S+Q7a/s1A"] as? String
         let productType = storedProductType ?? Self.machineIdentifier
-        let marketingName = storedName ?? Self.productTypes[productType]
+        if let profile = Self.productTypes[productType] {
+            self = profile
+            return
+        }
 
-        guard let marketingName,
+        guard let marketingName = storedName,
               let regulatoryModel = Self.regulatoryModels[marketingName] else {
             return nil
         }

@@ -283,7 +283,7 @@ private enum GestaltEditError: LocalizedError {
         case .invalidBackup: String(localized: "The backup is not a valid MobileGestalt plist.")
         case .verificationFailed: String(localized: "The MobileGestalt values after writing do not match the expected values.")
         case .emptyModelName: String(localized: "The device model name cannot be empty.")
-        case .unsupportedAIRegionDevice: String(localized: "A supported iPhone 15 Pro or later model could not be identified.")
+        case .unsupportedAIRegionDevice: String(localized: "A supported Apple Intelligence iPhone or iPad model could not be identified.")
         }
     }
 }
