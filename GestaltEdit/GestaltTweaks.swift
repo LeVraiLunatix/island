@@ -1,10 +1,10 @@
 import Foundation
 
 enum GestaltTweakCategory: String, CaseIterable, Identifiable {
+    case region
     case display
     case hardware
     case ipad
-    case region
     case internalFeatures
 
     var id: String { rawValue }
@@ -32,7 +32,6 @@ enum GestaltTweakID: String, CaseIterable, Identifiable {
     case stageManager
     case iPadOS
     case iPadApps
-    case disableRegionRestrictions
     case pencil
     case actionButton
     case internalInstall
@@ -74,8 +73,6 @@ enum GestaltTweakCatalog {
         .init(id: .stageManager, category: .ipad, title: String(localized: "Stage Manager Support"), detail: String(localized: "Marks the device as supporting Stage Manager."), values: ["qeaj75wk3HF4DwQ8qbIi7g": 1]),
         .init(id: .iPadApps, category: .ipad, title: String(localized: "Allow iPad Apps"), detail: String(localized: "Enables iPad app compatibility types on iPhone."), values: ["9MZ5AdH43csAUajl/dU+IQ": [1, 2]]),
         .init(id: .iPadOS, category: .ipad, title: String(localized: "Enable iPadOS Mode"), detail: String(localized: "Changes five capabilities and CacheData; experimental and high risk."), values: ["mG0AnH/Vy1veoqoLRAIgTA": 1, "UCG5MkVahJxG1YULbbd5Bg": 1, "ZYqko/XM5zD3XBfN5RmaXA": 1, "nVh/gwNpy7Jv1NOk00CMrw": 1, "uKc7FPnEO++lVhHWHFlGbQ": 1], isRisky: true),
-
-        .init(id: .disableRegionRestrictions, category: .region, title: String(localized: "Disable Region Restrictions"), detail: String(localized: "Writes US / LL/A to bypass restrictions such as forced shutter sound."), values: ["h63QSdBCiT/z0WU6rdQv6Q": "US", "zHeENZu+wbg7PUprwNwBWg": "LL/A"]),
 
         .init(id: .internalInstall, category: .internalFeatures, title: String(localized: "Apple Internal Install"), detail: String(localized: "Enables internal capabilities such as Metal HUD; some services may misbehave."), values: ["EqrsVvjcYDdxHBiQmGhAWw": 1], isRisky: true),
         .init(id: .internalStorage, category: .internalFeatures, title: String(localized: "Internal Storage View"), detail: String(localized: "Shows internal files in Storage settings; high risk on some iPads."), values: ["LBJfwOEzExRxzlAnSuI7eg": 1], isRisky: true),

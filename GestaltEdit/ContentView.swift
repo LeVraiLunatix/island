@@ -58,32 +58,12 @@ private struct TweakWorkbench: View {
                 Section { deviceStatus }
 
                 if viewModel.plist != nil {
+                    tweakSection(.region)
                     dynamicIslandSection
                     modelNameSection
 
-                    ForEach(GestaltTweakCategory.allCases) { category in
-                        let definitions = GestaltTweakCatalog.definitions.filter { $0.category == category }
-                        Section(category.label) {
-                            ForEach(definitions) { definition in
-                                TweakToggle(
-                                    definition: definition,
-                                    isOn: Binding(
-                                        get: { viewModel.selectedTweaks.contains(definition.id) },
-                                        set: { viewModel.setTweak(definition.id, enabled: $0) }
-                                    )
-                                )
-                            }
-                            if category == .region {
-                                Toggle(
-                                    "Enable Siri AI (US Region)",
-                                    isOn: Binding(
-                                        get: { viewModel.stagesAIRegion },
-                                        set: { viewModel.setAIRegion(enabled: $0) }
-                                    )
-                                )
-                                .disabled(viewModel.aiRegionProfile == nil)
-                            }
-                        }
+                    ForEach(GestaltTweakCategory.allCases.filter { $0 != .region }) { category in
+                        tweakSection(category)
                     }
 
                 }
@@ -101,6 +81,31 @@ private struct TweakWorkbench: View {
                 if viewModel.hasStagedTweaks {
                     applyBar
                 }
+            }
+        }
+    }
+
+    private func tweakSection(_ category: GestaltTweakCategory) -> some View {
+        let definitions = GestaltTweakCatalog.definitions.filter { $0.category == category }
+        return Section(category.label) {
+            ForEach(definitions) { definition in
+                TweakToggle(
+                    definition: definition,
+                    isOn: Binding(
+                        get: { viewModel.selectedTweaks.contains(definition.id) },
+                        set: { viewModel.setTweak(definition.id, enabled: $0) }
+                    )
+                )
+            }
+            if category == .region {
+                Toggle(
+                    "Enable Siri AI (US Region)",
+                    isOn: Binding(
+                        get: { viewModel.stagesAIRegion },
+                        set: { viewModel.setAIRegion(enabled: $0) }
+                    )
+                )
+                .disabled(viewModel.aiRegionProfile == nil)
             }
         }
     }

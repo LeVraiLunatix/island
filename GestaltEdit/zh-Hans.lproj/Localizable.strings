@@ -111,8 +111,6 @@
 "Enables iPad app compatibility types on iPhone." = "在 iPhone 上开放 iPad App 兼容类型。";
 "Enable iPadOS Mode" = "启用 iPadOS 模式";
 "Changes five capabilities and CacheData; experimental and high risk." = "同时修改五项能力与 CacheData；此功能为实验性且风险较高。";
-"Disable Region Restrictions" = "停用地区限制";
-"Writes US / LL/A to bypass restrictions such as forced shutter sound." = "写入 US / LL/A，可用于绕过强制快门声等地区限制。";
 "Apple Internal Install" = "Apple 内部安装";
 "Enables internal capabilities such as Metal HUD; some services may misbehave." = "开放 Metal HUD 等内部能力；部分系统服务可能异常。";
 "Internal Storage View" = "内部存储视图";

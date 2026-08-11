@@ -73,8 +73,6 @@ final class GestaltViewModel: ObservableObject {
                 selectedTweaks.remove(.disableLiquidGlassLowPerformance)
             } else if id == .disableLiquidGlassLowPerformance {
                 selectedTweaks.remove(.enableLiquidGlassLowPerformance)
-            } else if id == .disableRegionRestrictions {
-                stagesAIRegion = false
             }
         } else {
             selectedTweaks.remove(id)
@@ -83,9 +81,6 @@ final class GestaltViewModel: ObservableObject {
 
     func setAIRegion(enabled: Bool) {
         stagesAIRegion = enabled
-        if enabled {
-            selectedTweaks.remove(.disableRegionRestrictions)
-        }
     }
 
     func applySelectedTweaks() {

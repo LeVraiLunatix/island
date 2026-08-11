@@ -17,7 +17,7 @@ The interface follows the device language and currently supports English and Sim
 - Apple Pencil, Action Button, and Collision SOS settings
 - Always-On Display, AOD vibrancy, wallpaper parallax, and Liquid Glass low-performance mode
 - Stage Manager, iPad app compatibility, and Nugget's iPadOS `CacheData` patch
-- Region restrictions, Siri AI US region, Apple internal install, internal storage, and Security Research Device mode
+- Siri AI US region, Apple internal install, internal storage, and Security Research Device mode
 
 Presets follow Nugget's staged-apply model: toggles represent changes for the next write, and all selected changes are committed with the bottom Apply button. Selections are cleared after a successful write. Options that write conflicting values are mutually exclusive.
 
