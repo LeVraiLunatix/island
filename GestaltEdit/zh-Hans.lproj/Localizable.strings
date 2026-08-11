@@ -158,5 +158,3 @@
 "Failed to open the plist (errno=%d)." = "打开 plist 失败（errno=%d）。";
 "Failed to write the plist (errno=%d)." = "写入 plist 失败（errno=%d）。";
 "Post-write verification failed." = "写入后验证失败。";
-"Respring is unavailable in Simulator" = "模拟器无法执行重新载入桌面";
-"Unable to trigger respring: %s" = "无法触发重新载入桌面：%s";

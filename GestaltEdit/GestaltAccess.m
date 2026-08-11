@@ -11,12 +11,10 @@
 
 #import <errno.h>
 #import <fcntl.h>
-#import <mach/mach.h>
-#import <sys/stat.h>
 #import <sys/sysctl.h>
 #import <unistd.h>
 
-NSString * const GestaltPlistFileName = @"com.apple.MobileGestalt.plist";
+static NSString * const kGestaltPlistFileName = @"com.apple.MobileGestalt.plist";
 
 static NSString * const kMobileGestaltCacheDirectory =
     @"/private/var/containers/Shared/SystemGroup/"
@@ -55,99 +53,10 @@ static BOOL GestaltWriteAll(int fd, NSData *data)
     return YES;
 }
 
-#if !TARGET_OS_SIMULATOR
-kern_return_t bootstrap_look_up(
-    mach_port_t bootstrapPort,
-    const char *serviceName,
-    mach_port_t *servicePort);
-
-struct GestaltXPCMessage {
-    mach_msg_header_t header;
-    mach_msg_body_t body;
-    mach_msg_port_descriptor_t clientPort;
-    mach_msg_port_descriptor_t replyPort;
-};
-
-static mach_port_t GestaltMakeSendOnce(mach_port_t receivePort)
-{
-    mach_port_t sendOnce = MACH_PORT_NULL;
-    mach_msg_type_name_t type = 0;
-    kern_return_t result = mach_port_extract_right(
-        mach_task_self(),
-        receivePort,
-        MACH_MSG_TYPE_MAKE_SEND_ONCE,
-        &sendOnce,
-        &type);
-    return result == KERN_SUCCESS ? sendOnce : MACH_PORT_NULL;
-}
-
-static kern_return_t GestaltTriggerBackboardRespring(void)
-{
-    mach_port_t servicePort = MACH_PORT_NULL;
-    kern_return_t result = bootstrap_look_up(
-        bootstrap_port,
-        "com.apple.backboard.TouchDeliveryPolicyServer",
-        &servicePort);
-    if (result != KERN_SUCCESS || servicePort == MACH_PORT_NULL)
-        return result != KERN_SUCCESS ? result : KERN_INVALID_CAPABILITY;
-
-    mach_port_t clientPort = MACH_PORT_NULL;
-    mach_port_t replyPort = MACH_PORT_NULL;
-    result = mach_port_allocate(
-        mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &clientPort);
-    if (result != KERN_SUCCESS) return result;
-
-    mach_port_t sendOnce0 = GestaltMakeSendOnce(clientPort);
-    mach_port_t sendOnce1 = GestaltMakeSendOnce(clientPort);
-    if (sendOnce0 == MACH_PORT_NULL || sendOnce1 == MACH_PORT_NULL) {
-        mach_port_mod_refs(
-            mach_task_self(), clientPort, MACH_PORT_RIGHT_RECEIVE, -1);
-        return KERN_FAILURE;
-    }
-
-    result = mach_port_insert_right(
-        mach_task_self(), clientPort, clientPort, MACH_MSG_TYPE_MAKE_SEND);
-    if (result != KERN_SUCCESS) return result;
-
-    result = mach_port_allocate(
-        mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &replyPort);
-    if (result != KERN_SUCCESS) return result;
-
-    struct GestaltXPCMessage message = {0};
-    message.header.msgh_bits = MACH_MSGH_BITS_SET(
-        MACH_MSG_TYPE_COPY_SEND, 0, 0, MACH_MSGH_BITS_COMPLEX);
-    message.header.msgh_size = sizeof(message);
-    message.header.msgh_remote_port = servicePort;
-    message.header.msgh_id = 'w00t';
-    message.body.msgh_descriptor_count = 2;
-    message.clientPort.name = clientPort;
-    message.clientPort.disposition = MACH_MSG_TYPE_MOVE_RECEIVE;
-    message.clientPort.type = MACH_MSG_PORT_DESCRIPTOR;
-    message.replyPort.name = replyPort;
-    message.replyPort.disposition = MACH_MSG_TYPE_MAKE_SEND;
-    message.replyPort.type = MACH_MSG_PORT_DESCRIPTOR;
-
-    result = mach_msg(
-        &message.header,
-        MACH_SEND_MSG | MACH_MSG_OPTION_NONE,
-        message.header.msgh_size,
-        0,
-        MACH_PORT_NULL,
-        MACH_MSG_TIMEOUT_NONE,
-        MACH_PORT_NULL);
-
-    mach_port_deallocate(mach_task_self(), sendOnce0);
-    mach_port_deallocate(mach_task_self(), sendOnce1);
-    return result;
-}
-#endif
-
 @interface GestaltAccess ()
-@property (nonatomic, assign, readwrite) BOOL isConnected;
-@property (nonatomic, copy, readwrite) NSString *routeDescription;
-@property (nonatomic, copy, readwrite) NSString *cacheDirectoryPath;
-@property (nonatomic, copy, readwrite) NSString *plistPath;
-@property (nonatomic, assign, readwrite) NSPropertyListFormat lastReadFormat;
+@property (nonatomic, assign) BOOL isConnected;
+@property (nonatomic, copy) NSString *plistPath;
+@property (nonatomic, assign) NSPropertyListFormat lastReadFormat;
 @end
 
 @implementation GestaltAccess
@@ -191,11 +100,6 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
     );
 }
 
-- (NSString *)hostBundleIdentifier
-{
-    return NSBundle.mainBundle.bundleIdentifier ?: @"(nil)";
-}
-
 #pragma mark - Connection
 
 - (BOOL)connectWithError:(NSError **)error
@@ -207,7 +111,7 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
     }
 
     if (self.isConnected && _activeBadQueryLease.isActive &&
-        self.cacheDirectoryPath.length > 0) {
+        self.plistPath.length > 0) {
         if (error) *error = nil;
         return YES;
     }
@@ -221,14 +125,12 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
     [_activeBadQueryLease invalidate];
     _activeBadQueryLease = nil;
     self.isConnected = NO;
-    self.routeDescription = @"";
-    self.cacheDirectoryPath = nil;
     self.plistPath = nil;
 
     NSString *badQueryTarget = [kBadQueryMobileGestaltCacheDirectory
-        stringByAppendingPathComponent:GestaltPlistFileName];
+        stringByAppendingPathComponent:kGestaltPlistFileName];
     NSString *badQueryPlist = [kMobileGestaltCacheDirectory
-        stringByAppendingPathComponent:GestaltPlistFileName];
+        stringByAppendingPathComponent:kGestaltPlistFileName];
     NSString *badQueryDetail = nil;
     BadQueryLease *badQueryLease = [BadQueryLease leaseForPath:badQueryTarget
                                                         error:&badQueryDetail];
@@ -246,8 +148,6 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
 
     _activeBadQueryLease = badQueryLease;
     self.isConnected = YES;
-    self.routeDescription = @"bad-query";
-    self.cacheDirectoryPath = kMobileGestaltCacheDirectory;
     self.plistPath = badQueryPlist;
     if (error) *error = nil;
     return YES;
@@ -363,26 +263,6 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
 
     if (error) *error = nil;
     return YES;
-}
-
-#pragma mark - Respring
-
-- (BOOL)respringWithError:(NSError **)error
-{
-#if TARGET_OS_SIMULATOR
-    if (error) *error = GestaltError(12, NSLocalizedString(@"Respring is unavailable in Simulator", nil));
-    return NO;
-#else
-    kern_return_t result = GestaltTriggerBackboardRespring();
-    if (result != KERN_SUCCESS) {
-        if (error) *error = GestaltError(12,
-            [NSString stringWithFormat:NSLocalizedString(@"Unable to trigger respring: %s", nil),
-                mach_error_string(result)]);
-        return NO;
-    }
-    if (error) *error = nil;
-    return YES;
-#endif
 }
 
 @end

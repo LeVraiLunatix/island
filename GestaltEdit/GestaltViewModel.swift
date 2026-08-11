@@ -6,7 +6,6 @@ final class GestaltViewModel: ObservableObject {
     @Published var plist: GestaltPlist?
     @Published var isDirty = false
     @Published var isBusy = false
-    @Published var lastError: String?
     @Published var notice: GestaltNotice?
     @Published private(set) var hasAttemptedLoad = false
     @Published private(set) var backups: [GestaltBackup] = []
@@ -52,7 +51,6 @@ final class GestaltViewModel: ObservableObject {
         guard !isBusy else { return }
         hasAttemptedLoad = true
         isBusy = true
-        lastError = nil
         notice = nil
 
         defer { isBusy = false }
@@ -240,7 +238,6 @@ final class GestaltViewModel: ObservableObject {
         completion: (() -> Void)? = nil
     ) {
         isBusy = true
-        lastError = nil
         notice = nil
 
         do {
@@ -285,7 +282,6 @@ final class GestaltViewModel: ObservableObject {
     }
 
     private func report(_ error: Error) {
-        lastError = error.localizedDescription
         notice = GestaltNotice(kind: .error, message: error.localizedDescription)
     }
 }

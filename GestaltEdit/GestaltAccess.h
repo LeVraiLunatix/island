@@ -11,8 +11,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString * const GestaltPlistFileName;
-
 @interface GestaltAccess : NSObject
 
 + (instancetype)shared;
@@ -25,12 +23,6 @@ extern NSString * const GestaltPlistFileName;
 /// "24A5390f". An empty string means the build identifier could not be read.
 + (NSString *)currentOSBuild;
 
-@property (nonatomic, readonly) BOOL isConnected;
-@property (nonatomic, copy, readonly) NSString *routeDescription;
-@property (nonatomic, copy, readonly) NSString *cacheDirectoryPath;
-@property (nonatomic, copy, readonly) NSString *plistPath;
-@property (nonatomic, copy, readonly) NSString *hostBundleIdentifier;
-
 /// Acquires a bad_query lease and verifies the plist is writable. Idempotent.
 - (BOOL)connectWithError:(NSError **)error;
 
@@ -38,16 +30,9 @@ extern NSString * const GestaltPlistFileName;
 - (nullable NSDictionary *)readGestaltWithError:(NSError **)error;
 /// Reads the live plist without parsing or re-serializing it.
 - (nullable NSData *)readGestaltDataWithError:(NSError **)error;
-/// Returns the format (NSPropertyListXMLFormat_v1_0 / NSPropertyListBinaryFormat_v1_0)
-/// detected by the last successful read.
-@property (nonatomic, readonly) NSPropertyListFormat lastReadFormat;
-
 /// Rewrites the existing plist inode and preserves its ownership, flags and
 /// extended attributes.
 - (BOOL)saveGestalt:(NSDictionary *)plist error:(NSError **)error;
-
-/// Reloads the system UI by restarting backboardd without a full device reboot.
-- (BOOL)respringWithError:(NSError **)error;
 
 @end
 

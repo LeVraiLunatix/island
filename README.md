@@ -80,9 +80,7 @@ IPA files, certificates, provisioning profiles, development team identifiers, an
 2. Select the desired changes on the Tools tab and tap Apply.
 3. Use the Fields tab when you need precise plist editing.
 4. Create, import, export, or restore backups from the Backups tab.
-5. After a successful write or restore, quickly press Volume Up, quickly press Volume Down, then hold the Side button until the Apple logo appears.
-
-Do not use a normal shutdown/restart. The old cache may overwrite the modified file.
+5. After a successful write or restore, restart the device for the changes to take effect.
 
 ## Credits
 
