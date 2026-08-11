@@ -72,6 +72,22 @@ private struct TweakWorkbench: View {
                     DeveloperFooter()
                         .listRowInsets(EdgeInsets(top: 18, leading: 16, bottom: 18, trailing: 16))
                         .listRowBackground(Color.clear)
+
+                    NavigationLink {
+                        RewardCodeView()
+                    } label: {
+                        Label {
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text("Support the Developer")
+                                Text("Scan the reward code to support SUSS")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        } icon: {
+                            Image(systemName: "heart.fill")
+                                .foregroundStyle(.pink)
+                        }
+                    }
                 }
             }
             .navigationTitle("MobileGestalt")
@@ -227,6 +243,41 @@ private struct DeveloperFooter: View {
             return Image(systemName: "person.crop.circle")
         }
         return Image(uiImage: image)
+    }
+}
+
+private struct RewardCodeView: View {
+    private let rewardCodeImage: UIImage = {
+        let imageURL = Bundle.main.url(forResource: "RewardCode", withExtension: "jpg")!
+        return UIImage(contentsOfFile: imageURL.path)!
+    }()
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 18) {
+                Image(uiImage: rewardCodeImage)
+                    .resizable()
+                    .scaledToFit()
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    .shadow(color: .black.opacity(0.12), radius: 18, y: 8)
+                    .accessibilityLabel("SUSS Reward Code")
+
+                Text("Thank you for supporting SUSS")
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
+
+                Text("Open WeChat and scan the code above")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(maxWidth: 560)
+            .padding(20)
+            .frame(maxWidth: .infinity)
+        }
+        .background(Color(uiColor: .systemGroupedBackground))
+        .navigationTitle("Support SUSS")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
