@@ -5,7 +5,7 @@ struct AIRegionProfile: Equatable {
     let marketingName: String
     let regulatoryModel: String
 
-    private init(marketingName: String, regulatoryModel: String) {
+    fileprivate init(marketingName: String, regulatoryModel: String) {
         self.marketingName = marketingName
         self.regulatoryModel = regulatoryModel
     }
@@ -84,8 +84,7 @@ struct AIRegionProfile: Equatable {
         let storedName = marketingKeys
             .compactMap { cacheExtra[$0] as? String }
             .first { Self.regulatoryModels[$0] != nil }
-        let storedProductType = cacheExtra["0+nc/Udy4WNG8S+Q7a/s1A"] as? String
-        let productType = storedProductType ?? Self.machineIdentifier
+        let productType = Self.detectedProductType(in: plist)
         if let profile = Self.profile(forProductType: productType) {
             self = profile
             return
@@ -111,6 +110,10 @@ struct AIRegionProfile: Equatable {
         return productTypes[String(productType[..<separator])]
     }
 
+    fileprivate static func detectedProductType(in plist: GestaltPlist) -> String {
+        plist.cacheExtra["0+nc/Udy4WNG8S+Q7a/s1A"] as? String ?? machineIdentifier
+    }
+
     private static var machineIdentifier: String {
         var size = 0
         guard sysctlbyname("hw.machine", nil, &size, nil, 0) == 0,
@@ -123,8 +126,45 @@ struct AIRegionProfile: Equatable {
     }
 }
 
+struct AIRegionConfiguration: Equatable {
+    let profile: AIRegionProfile
+    let spoofedProductType: String?
+    let spoofedHardwareModel: String?
+    let spoofedCPUModel: String?
+
+    var requiresDeviceSpoofing: Bool { spoofedProductType != nil }
+
+    static func resolve(for plist: GestaltPlist) -> AIRegionConfiguration {
+        if let profile = AIRegionProfile(plist: plist) {
+            return AIRegionConfiguration(
+                profile: profile,
+                spoofedProductType: nil,
+                spoofedHardwareModel: nil,
+                spoofedCPUModel: nil
+            )
+        }
+
+        let productType = AIRegionProfile.detectedProductType(in: plist)
+        if productType.hasPrefix("iPad") {
+            return AIRegionConfiguration(
+                profile: AIRegionProfile(marketingName: "iPad mini (A17 Pro)", regulatoryModel: "A2993"),
+                spoofedProductType: "iPad16,1",
+                spoofedHardwareModel: "J410AP",
+                spoofedCPUModel: "t8130"
+            )
+        }
+
+        return AIRegionConfiguration(
+            profile: AIRegionProfile(marketingName: "iPhone 15 Pro", regulatoryModel: "A2848"),
+            spoofedProductType: "iPhone16,1",
+            spoofedHardwareModel: "D83AP",
+            spoofedCPUModel: "t8130"
+        )
+    }
+}
+
 struct GestaltNotice: Identifiable {
-    enum Kind { case error, restartRequired, backupCreated }
+    enum Kind { case error, restartRequired, backupCreated, riskWarning }
 
     let id = UUID()
     let kind: Kind
@@ -135,6 +175,7 @@ struct GestaltNotice: Identifiable {
         case .error: String(localized: "Operation Failed")
         case .restartRequired: String(localized: "Write Complete")
         case .backupCreated: String(localized: "Backup Complete")
+        case .riskWarning: String(localized: "High Risk")
         }
     }
 }

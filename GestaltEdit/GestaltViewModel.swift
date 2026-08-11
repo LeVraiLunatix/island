@@ -22,6 +22,10 @@ final class GestaltViewModel: ObservableObject {
         plist.flatMap(AIRegionProfile.init(plist:))
     }
 
+    var requiresForcedAIEnable: Bool {
+        plist != nil && aiRegionProfile == nil
+    }
+
     var isAIRegionConfigured: Bool {
         guard let profile = aiRegionProfile,
               let cacheExtra = plist?.cacheExtra else { return false }
@@ -81,6 +85,12 @@ final class GestaltViewModel: ObservableObject {
 
     func setAIRegion(enabled: Bool) {
         stagesAIRegion = enabled
+        if enabled, requiresForcedAIEnable {
+            notice = GestaltNotice(
+                kind: .riskWarning,
+                message: String(localized: "This device does not officially support Siri AI. Force enabling uses Nugget-style product, hardware, and CPU model spoofing. It may temporarily break Face ID, cause system instability or boot loops, and could require restoring the device. A backup will be created before writing.")
+            )
+        }
     }
 
     func applySelectedTweaks() {
@@ -98,17 +108,24 @@ final class GestaltViewModel: ObservableObject {
                 guard !name.isEmpty else { throw GestaltEditError.emptyModelName }
                 try pending.setModelName(name)
             }
-            var expectedProfile: AIRegionProfile?
+            var expectedConfiguration: AIRegionConfiguration?
             if stagesAIRegion {
-                guard let profile = aiRegionProfile else {
-                    throw GestaltEditError.unsupportedAIRegionDevice
+                let configuration = AIRegionConfiguration.resolve(for: pending)
+                let profile = configuration.profile
+                if let productType = configuration.spoofedProductType,
+                   let hardwareModel = configuration.spoofedHardwareModel,
+                   let cpuModel = configuration.spoofedCPUModel {
+                    pending.setCacheExtra(1, forKey: "A62OafQ85EJAiiqKn4agtg")
+                    pending.setCacheExtra(productType, forKey: "h9jDsbgj7xIVeIQ8S3/X3Q")
+                    pending.setCacheExtra(hardwareModel, forKey: "oYicEKzVTz4/CxxE05pEgQ")
+                    pending.setCacheExtra(cpuModel, forKey: "5pYKlGnYYBzGvAlIU8RjEQ")
                 }
                 pending.setCacheExtra("LL", forKey: "h63QSdBCiT/z0WU6rdQv6Q")
                 pending.setCacheExtra("LL/A", forKey: "yK+xavymRGZ3xWc1tb8XDg")
                 pending.setCacheExtra(profile.regulatoryModel, forKey: "97JDvERpVwO+GHtthIh7hA")
-                expectedProfile = profile
+                expectedConfiguration = configuration
             }
-            save(pending, expectedProfile: expectedProfile) { [weak self] in
+            save(pending, expectedAIRegion: expectedConfiguration) { [weak self] in
                 self?.selectedTweaks.removeAll()
                 self?.dynamicIslandSubtype = nil
                 self?.changesModelName = false
@@ -122,7 +139,7 @@ final class GestaltViewModel: ObservableObject {
 
     func applyChanges() {
         guard !isBusy, let plist else { return }
-        save(plist, expectedProfile: nil)
+        save(plist, expectedAIRegion: nil)
     }
 
     func createBackup() {
@@ -194,7 +211,7 @@ final class GestaltViewModel: ObservableObject {
             ) as? [String: Any] else {
                 throw GestaltEditError.invalidBackup
             }
-            save(GestaltPlist(dict: dictionary), expectedProfile: nil)
+            save(GestaltPlist(dict: dictionary), expectedAIRegion: nil)
         } catch {
             report(error)
         }
@@ -219,7 +236,7 @@ final class GestaltViewModel: ObservableObject {
 
     private func save(
         _ pendingPlist: GestaltPlist,
-        expectedProfile: AIRegionProfile?,
+        expectedAIRegion: AIRegionConfiguration?,
         completion: (() -> Void)? = nil
     ) {
         isBusy = true
@@ -235,12 +252,20 @@ final class GestaltViewModel: ObservableObject {
             }
             let verifiedPlist = GestaltPlist(dict: verification)
 
-            if let expectedProfile {
+            if let expectedAIRegion {
                 let cacheExtra = verifiedPlist.cacheExtra
                 guard cacheExtra["h63QSdBCiT/z0WU6rdQv6Q"] as? String == "LL",
                       cacheExtra["yK+xavymRGZ3xWc1tb8XDg"] as? String == "LL/A",
-                      cacheExtra["97JDvERpVwO+GHtthIh7hA"] as? String == expectedProfile.regulatoryModel else {
+                      cacheExtra["97JDvERpVwO+GHtthIh7hA"] as? String == expectedAIRegion.profile.regulatoryModel else {
                     throw GestaltEditError.verificationFailed
+                }
+                if expectedAIRegion.requiresDeviceSpoofing {
+                    guard cacheExtra["A62OafQ85EJAiiqKn4agtg"] as? Int == 1,
+                          cacheExtra["h9jDsbgj7xIVeIQ8S3/X3Q"] as? String == expectedAIRegion.spoofedProductType,
+                          cacheExtra["oYicEKzVTz4/CxxE05pEgQ"] as? String == expectedAIRegion.spoofedHardwareModel,
+                          cacheExtra["5pYKlGnYYBzGvAlIU8RjEQ"] as? String == expectedAIRegion.spoofedCPUModel else {
+                        throw GestaltEditError.verificationFailed
+                    }
                 }
             }
 
@@ -270,7 +295,6 @@ private enum GestaltEditError: LocalizedError {
     case invalidBackup
     case verificationFailed
     case emptyModelName
-    case unsupportedAIRegionDevice
 
     var errorDescription: String? {
         switch self {
@@ -278,7 +302,6 @@ private enum GestaltEditError: LocalizedError {
         case .invalidBackup: String(localized: "The backup is not a valid MobileGestalt plist.")
         case .verificationFailed: String(localized: "The MobileGestalt values after writing do not match the expected values.")
         case .emptyModelName: String(localized: "The device model name cannot be empty.")
-        case .unsupportedAIRegionDevice: String(localized: "A supported Apple Intelligence iPhone or iPad model could not be identified.")
         }
     }
 }

@@ -99,13 +99,29 @@ private struct TweakWorkbench: View {
             }
             if category == .region {
                 Toggle(
-                    "Enable Siri AI (US Region)",
                     isOn: Binding(
                         get: { viewModel.stagesAIRegion },
                         set: { viewModel.setAIRegion(enabled: $0) }
                     )
-                )
-                .disabled(viewModel.aiRegionProfile == nil)
+                ) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        HStack(spacing: 6) {
+                            Text("Enable Siri AI (US Region)")
+                            if viewModel.requiresForcedAIEnable {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(.orange)
+                                    .accessibilityLabel("High Risk")
+                            }
+                        }
+                        if viewModel.requiresForcedAIEnable {
+                            Text("Unsupported device: force enable with Nugget-style device spoofing. Face ID or system stability may be affected.")
+                                .font(.caption)
+                                .foregroundStyle(.orange)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                }
             }
         }
     }
