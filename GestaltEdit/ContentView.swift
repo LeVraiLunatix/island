@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import UniformTypeIdentifiers
 
 struct ContentView: View {
@@ -84,6 +85,13 @@ private struct TweakWorkbench: View {
                             }
                         }
                     }
+
+                }
+
+                Section(String(localized: "Developer")) {
+                    DeveloperFooter()
+                        .listRowInsets(EdgeInsets(top: 18, leading: 16, bottom: 18, trailing: 16))
+                        .listRowBackground(Color.clear)
                 }
             }
             .navigationTitle("MobileGestalt")
@@ -167,6 +175,37 @@ private struct TweakWorkbench: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .background(.bar)
+    }
+}
+
+private struct DeveloperFooter: View {
+    private let douyinURL = URL(string: "https://v.douyin.com/hHHMAlF5bE0/")!
+
+    var body: some View {
+        Link(destination: douyinURL) {
+            HStack(spacing: 10) {
+                avatarImage
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 34, height: 34)
+                    .clipShape(Circle())
+
+                Text("SUSS")
+                    .font(.subheadline.weight(.medium))
+
+                Spacer()
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("开发者 SUSS，点击打开抖音")
+    }
+
+    private var avatarImage: Image {
+        guard let url = Bundle.main.url(forResource: "SUSSAvatar", withExtension: "jpg"),
+              let image = UIImage(contentsOfFile: url.path) else {
+            return Image(systemName: "person.crop.circle")
+        }
+        return Image(uiImage: image)
     }
 }
 
