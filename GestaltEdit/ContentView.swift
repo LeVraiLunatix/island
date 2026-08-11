@@ -71,7 +71,6 @@ private struct TweakWorkbench: View {
                 Section(String(localized: "Developer")) {
                     DeveloperFooter()
                         .listRowInsets(EdgeInsets(top: 18, leading: 16, bottom: 18, trailing: 16))
-                        .listRowBackground(Color.clear)
 
                     NavigationLink {
                         RewardCodeView()
