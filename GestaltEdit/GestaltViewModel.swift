@@ -139,7 +139,13 @@ final class GestaltViewModel: ObservableObject {
             let data = try access.readGestaltData()
             let backup = try GestaltBackupStore.create(from: data)
             refreshBackups()
-            notice = GestaltNotice(kind: .backupCreated, message: "已保存 \(backup.name).plist，可在备份页导出。")
+            notice = GestaltNotice(
+                kind: .backupCreated,
+                message: String(
+                    format: String(localized: "Saved %@.plist. You can export it from the Backups tab."),
+                    backup.name
+                )
+            )
         } catch {
             report(error)
         }
@@ -170,7 +176,11 @@ final class GestaltViewModel: ObservableObject {
             refreshBackups()
             notice = GestaltNotice(
                 kind: .backupCreated,
-                message: "已导入 \(url.lastPathComponent)，保存为 \(backup.name).plist。"
+                message: String(
+                    format: String(localized: "Imported %@ and saved it as %@.plist."),
+                    url.lastPathComponent,
+                    backup.name
+                )
             )
         } catch {
             report(error)
@@ -245,7 +255,7 @@ final class GestaltViewModel: ObservableObject {
             refreshBackups()
             notice = GestaltNotice(
                 kind: .restartRequired,
-                message: "修改已写入并回读校验，原文件也已自动备份。请立即强制重启：快速按音量加、音量减，再持续按住侧边键，直到出现 Apple 标志。不要使用普通关机重启。"
+                message: String(localized: "Changes were written and verified, and the original file was backed up automatically. Force restart now: quickly press Volume Up, quickly press Volume Down, then hold the Side button until the Apple logo appears. Do not use a normal shutdown/restart.")
             )
         } catch {
             isDirty = true
@@ -269,11 +279,11 @@ private enum GestaltEditError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .invalidPlist: "MobileGestalt plist 不是有效字典。"
-        case .invalidBackup: "备份不是有效的 MobileGestalt plist。"
-        case .verificationFailed: "写入后的 MobileGestalt 值与预期不一致。"
-        case .emptyModelName: "设备型号名称不能为空。"
-        case .unsupportedAIRegionDevice: "无法识别受支持的 iPhone 15 Pro 或更新机型。"
+        case .invalidPlist: String(localized: "The MobileGestalt plist is not a valid dictionary.")
+        case .invalidBackup: String(localized: "The backup is not a valid MobileGestalt plist.")
+        case .verificationFailed: String(localized: "The MobileGestalt values after writing do not match the expected values.")
+        case .emptyModelName: String(localized: "The device model name cannot be empty.")
+        case .unsupportedAIRegionDevice: String(localized: "A supported iPhone 15 Pro or later model could not be identified.")
         }
     }
 }

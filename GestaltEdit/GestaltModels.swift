@@ -73,9 +73,9 @@ struct GestaltNotice: Identifiable {
 
     var title: String {
         switch kind {
-        case .error: "操作失败"
-        case .restartRequired: "写入完成"
-        case .backupCreated: "备份完成"
+        case .error: String(localized: "Operation Failed")
+        case .restartRequired: String(localized: "Write Complete")
+        case .backupCreated: String(localized: "Backup Complete")
         }
     }
 }
@@ -93,13 +93,13 @@ enum PlistValueKind: String, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .string: "String"
-        case .integer: "Integer"
-        case .float: "Float"
-        case .boolean: "Boolean"
-        case .data: "Data"
-        case .array: "Array"
-        case .dictionary: "Dictionary"
+        case .string: String(localized: "String")
+        case .integer: String(localized: "Integer")
+        case .float: String(localized: "Float")
+        case .boolean: String(localized: "Boolean")
+        case .data: String(localized: "Data")
+        case .array: String(localized: "Array")
+        case .dictionary: String(localized: "Dictionary")
         }
     }
 
@@ -135,15 +135,15 @@ struct PlistValueInfo {
 
         switch kind {
         case .string:
-            summary = text.isEmpty ? "Empty string" : text
+            summary = text.isEmpty ? String(localized: "Empty string") : text
         case .integer, .float, .boolean:
             summary = text
         case .data:
-            summary = "Data (\((value as? Data)?.count ?? 0) bytes)"
+            summary = String(format: String(localized: "Data (%d bytes)"), (value as? Data)?.count ?? 0)
         case .array:
-            summary = "Array (\((value as? NSArray)?.count ?? 0) items)"
+            summary = String(format: String(localized: "Array (%d items)"), (value as? NSArray)?.count ?? 0)
         case .dictionary:
-            summary = "Dictionary (\((value as? NSDictionary)?.count ?? 0) items)"
+            summary = String(format: String(localized: "Dictionary (%d items)"), (value as? NSDictionary)?.count ?? 0)
         }
 
         return PlistValueInfo(kind: kind, summary: summary, searchText: text)
@@ -172,12 +172,12 @@ struct PlistValueInfo {
             return text
         case .integer:
             guard let value = Int64(trimmed) else {
-                throw PlistValueError.invalid("Invalid integer")
+                throw PlistValueError.invalid(String(localized: "Invalid integer"))
             }
             return NSNumber(value: value)
         case .float:
             guard let value = Double(trimmed) else {
-                throw PlistValueError.invalid("Invalid floating-point number")
+                throw PlistValueError.invalid(String(localized: "Invalid floating-point number"))
             }
             return NSNumber(value: value)
         case .boolean:
@@ -187,11 +187,11 @@ struct PlistValueInfo {
             case "false", "0", "no":
                 return NSNumber(value: false)
             default:
-                throw PlistValueError.invalid("Enter true or false")
+                throw PlistValueError.invalid(String(localized: "Enter true or false"))
             }
         case .data:
             guard let data = Data(base64Encoded: trimmed) else {
-                throw PlistValueError.invalid("Invalid Base64 data")
+                throw PlistValueError.invalid(String(localized: "Invalid Base64 data"))
             }
             return data
         case .array:
@@ -215,7 +215,9 @@ struct PlistValueInfo {
         guard let data = text.data(using: .utf8),
               let object = try? JSONSerialization.jsonObject(with: data),
               object is T else {
-            throw PlistValueError.invalid("Invalid JSON \(T.self)")
+            throw PlistValueError.invalid(
+                String(format: String(localized: "Invalid JSON for type %@"), String(describing: T.self))
+            )
         }
         return object
     }

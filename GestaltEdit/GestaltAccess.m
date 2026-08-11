@@ -217,8 +217,8 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
     }
 
     if (!MCMBridgeAvailable()) {
-        if (error) *error = GestaltError(1,
-            @"ContainerManager 桥接不可用（iOS 版本过旧或缺少 libsystem_containermanager）。");
+        if (error) *error = GestaltError(1, NSLocalizedString(
+            @"ContainerManager bridge is unavailable (the iOS version is too old or libsystem_containermanager is missing).", nil));
         return NO;
     }
 
@@ -306,10 +306,8 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
         return YES;
     }
 
-    if (error) *error = GestaltError(2,
-        @"所有 ContainerManager 路线都失败：当前系统没有暴露 MobileGestalt 缓存目录的读写权限。"
-        @"（参考 PoC：iOS 26 走 geod 穿越，iOS 27 beta 4 走 class-13 直连；"
-        @"部分系统需要把 bundle id 签成 com.apple.mobile.MobileHouseArrest。）");
+    if (error) *error = GestaltError(2, NSLocalizedString(
+        @"All ContainerManager routes failed. This system does not expose read/write access to the MobileGestalt cache directory. The iOS 26 route uses geod traversal, while some iOS 27 builds use direct class-13 access. Some systems require the com.apple.mobile.MobileHouseArrest bundle identifier.", nil));
     return NO;
 }
 
@@ -320,7 +318,7 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
     if (![self connectWithError:error]) return nil;
     if (![[NSFileManager defaultManager] fileExistsAtPath:self.plistPath]) {
         if (error) *error = GestaltError(3,
-            [NSString stringWithFormat:@"plist 不存在：%@", self.plistPath]);
+            [NSString stringWithFormat:NSLocalizedString(@"The plist does not exist: %@", nil), self.plistPath]);
         return nil;
     }
 
@@ -329,7 +327,7 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
                                           options:NSDataReadingMappedIfSafe
                                             error:&readError];
     if (!data) {
-        if (error) *error = readError ?: GestaltError(4, @"读取 plist 失败");
+        if (error) *error = readError ?: GestaltError(4, NSLocalizedString(@"Failed to read the plist.", nil));
         return nil;
     }
     if (error) *error = nil;
@@ -349,7 +347,7 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
                                                            error:&parseError];
     if (![plist isKindOfClass:NSDictionary.class]) {
         if (error) *error = parseError ?: GestaltError(5,
-            @"plist 顶层不是字典");
+            NSLocalizedString(@"The plist top level is not a dictionary.", nil));
         return nil;
     }
     self.lastReadFormat = format;
@@ -360,7 +358,7 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
 {
     if (![self connectWithError:error]) return NO;
     if (![plist isKindOfClass:NSDictionary.class]) {
-        if (error) *error = GestaltError(6, @"保存内容不是字典");
+        if (error) *error = GestaltError(6, NSLocalizedString(@"The content to save is not a dictionary.", nil));
         return NO;
     }
 
@@ -375,7 +373,7 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
                                                              options:0
                                                                error:&serializeError];
     if (!data) {
-        if (error) *error = serializeError ?: GestaltError(7, @"plist 序列化失败");
+        if (error) *error = serializeError ?: GestaltError(7, NSLocalizedString(@"Failed to serialize the plist.", nil));
         return NO;
     }
 
@@ -385,7 +383,7 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
                                               options:0
                                                 error:&readError];
     if (!original) {
-        if (error) *error = readError ?: GestaltError(8, @"读取原始 plist 失败");
+        if (error) *error = readError ?: GestaltError(8, NSLocalizedString(@"Failed to read the original plist.", nil));
         return NO;
     }
 
@@ -393,7 +391,7 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
                   O_WRONLY | O_CLOEXEC | O_NOFOLLOW);
     if (fd < 0) {
         if (error) *error = GestaltError(9,
-            [NSString stringWithFormat:@"打开 plist 失败 errno=%d", errno]);
+            [NSString stringWithFormat:NSLocalizedString(@"Failed to open the plist (errno=%d).", nil), errno]);
         return NO;
     }
 
@@ -410,14 +408,14 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
         fsync(fd);
         close(fd);
         if (error) *error = GestaltError(10,
-            [NSString stringWithFormat:@"写入 plist 失败 errno=%d", writeErrno]);
+            [NSString stringWithFormat:NSLocalizedString(@"Failed to write the plist (errno=%d).", nil), writeErrno]);
         return NO;
     }
     close(fd);
 
     NSData *verification = [NSData dataWithContentsOfFile:targetPath];
     if (![verification isEqualToData:data]) {
-        if (error) *error = GestaltError(11, @"写入后校验失败");
+        if (error) *error = GestaltError(11, NSLocalizedString(@"Post-write verification failed.", nil));
         return NO;
     }
 
@@ -430,13 +428,13 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
 - (BOOL)respringWithError:(NSError **)error
 {
 #if TARGET_OS_SIMULATOR
-    if (error) *error = GestaltError(12, @"Respring is unavailable in Simulator");
+    if (error) *error = GestaltError(12, NSLocalizedString(@"Respring is unavailable in Simulator", nil));
     return NO;
 #else
     kern_return_t result = GestaltTriggerBackboardRespring();
     if (result != KERN_SUCCESS) {
         if (error) *error = GestaltError(12,
-            [NSString stringWithFormat:@"无法触发 respring：%s",
+            [NSString stringWithFormat:NSLocalizedString(@"Unable to trigger respring: %s", nil),
                 mach_error_string(result)]);
         return NO;
     }

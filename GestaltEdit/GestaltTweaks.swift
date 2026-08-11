@@ -1,13 +1,23 @@
 import Foundation
 
 enum GestaltTweakCategory: String, CaseIterable, Identifiable {
-    case display = "显示与外观"
-    case hardware = "硬件能力"
-    case ipad = "iPad 能力"
-    case region = "地区"
-    case internalFeatures = "内部与研究"
+    case display
+    case hardware
+    case ipad
+    case region
+    case internalFeatures
 
     var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .display: String(localized: "Display & Appearance")
+        case .hardware: String(localized: "Hardware Capabilities")
+        case .ipad: String(localized: "iPad Capabilities")
+        case .region: String(localized: "Region")
+        case .internalFeatures: String(localized: "Internal & Research")
+        }
+    }
 }
 
 enum GestaltTweakID: String, CaseIterable, Identifiable {
@@ -46,30 +56,30 @@ struct GestaltTweakDefinition: Identifiable {
 
 enum GestaltTweakCatalog {
     static let definitions: [GestaltTweakDefinition] = [
-        .init(id: .supportsDynamicIsland, category: .display, title: "启用灵动岛能力", detail: "Nugget 的备用启用方式。", values: ["YlEtTtHlNesRBMal1CqRaA": 1]),
-        .init(id: .alwaysOnDisplay, category: .display, title: "全天候显示", detail: "在不支持的设备上可能增加烧屏风险。", values: ["2OOJf1VhaM7NxfRok3HbWQ": 1, "j8/Omm6s1lsmTDFsXjsBfA": 1], isRisky: true),
-        .init(id: .alwaysOnDisplayVibrancy, category: .display, title: "全天候显示鲜明度", detail: "AOD 显示异常时使用。", values: ["ykpu7qyhqFweVMKtxNylWA": 1]),
-        .init(id: .disableParallax, category: .display, title: "停用墙纸视差", detail: "关闭墙纸随设备移动的视差效果。", values: ["UIParallaxCapability": 0]),
-        .init(id: .enableLiquidGlassLowPerformance, category: .display, title: "启用液态玻璃低性能模式", detail: "适用于 iOS 26 及更新系统。", values: ["SAGvsp6O6kAQ4fEfDJpC4Q": 1]),
-        .init(id: .disableLiquidGlassLowPerformance, category: .display, title: "停用液态玻璃低性能模式", detail: "与上方选项互斥。", values: ["SAGvsp6O6kAQ4fEfDJpC4Q": 0]),
+        .init(id: .supportsDynamicIsland, category: .display, title: String(localized: "Enable Dynamic Island Capability"), detail: String(localized: "Nugget's alternate enable method."), values: ["YlEtTtHlNesRBMal1CqRaA": 1]),
+        .init(id: .alwaysOnDisplay, category: .display, title: String(localized: "Always-On Display"), detail: String(localized: "May increase burn-in risk on unsupported devices."), values: ["2OOJf1VhaM7NxfRok3HbWQ": 1, "j8/Omm6s1lsmTDFsXjsBfA": 1], isRisky: true),
+        .init(id: .alwaysOnDisplayVibrancy, category: .display, title: String(localized: "AOD Vibrancy"), detail: String(localized: "Use this when AOD rendering looks incorrect."), values: ["ykpu7qyhqFweVMKtxNylWA": 1]),
+        .init(id: .disableParallax, category: .display, title: String(localized: "Disable Wallpaper Parallax"), detail: String(localized: "Stops wallpaper motion based on device movement."), values: ["UIParallaxCapability": 0]),
+        .init(id: .enableLiquidGlassLowPerformance, category: .display, title: String(localized: "Enable Liquid Glass Low-Performance Mode"), detail: String(localized: "For iOS 26 and later."), values: ["SAGvsp6O6kAQ4fEfDJpC4Q": 1]),
+        .init(id: .disableLiquidGlassLowPerformance, category: .display, title: String(localized: "Disable Liquid Glass Low-Performance Mode"), detail: String(localized: "Mutually exclusive with the option above."), values: ["SAGvsp6O6kAQ4fEfDJpC4Q": 0]),
 
-        .init(id: .bootChime, category: .hardware, title: "启动与关机提示音", detail: "启用设备启动/关机提示音能力。", values: ["QHxt+hGLaBPbQJbXiUJX3w": 1]),
-        .init(id: .chargeLimit, category: .hardware, title: "充电上限菜单", detail: "显示设置菜单，实际限制能力取决于硬件。", values: ["37NVydb//GP/GrhuTN+exg": 1]),
-        .init(id: .tapToWake, category: .hardware, title: "轻点唤醒", detail: "主要用于 iPhone SE 等未开放机型。", values: ["yZf3GTRMGTuwSV/lD7Cagw": 1]),
-        .init(id: .cameraButton, category: .hardware, title: "iPhone 16 相机控制设置", detail: "显示相机控制菜单及相关能力。", values: ["CwvKxM2cEogD3p+HYgaW0Q": 1, "oOV1jhJbdV3AddkcCg0AEA": 1]),
-        .init(id: .pencil, category: .hardware, title: "Apple Pencil 设置", detail: "显示 Apple Pencil 设置页。", values: ["yhHcB0iH0d1XzPO/CFd3ow": 1]),
-        .init(id: .actionButton, category: .hardware, title: "操作按钮设置", detail: "显示操作按钮设置页。", values: ["cT44WE1EohiwRzhsZ8xEsw": 1]),
-        .init(id: .collisionSOS, category: .hardware, title: "碰撞检测 SOS", detail: "在 SOS 设置中显示碰撞检测。", values: ["HCzWusHQwZDea6nNhaKndw": 1]),
+        .init(id: .bootChime, category: .hardware, title: String(localized: "Boot & Shutdown Chime"), detail: String(localized: "Enables the device boot and shutdown chime capability."), values: ["QHxt+hGLaBPbQJbXiUJX3w": 1]),
+        .init(id: .chargeLimit, category: .hardware, title: String(localized: "Charge Limit Menu"), detail: String(localized: "Shows the Settings menu; actual limiting depends on hardware."), values: ["37NVydb//GP/GrhuTN+exg": 1]),
+        .init(id: .tapToWake, category: .hardware, title: String(localized: "Tap to Wake"), detail: String(localized: "Primarily for models such as iPhone SE where it is unavailable."), values: ["yZf3GTRMGTuwSV/lD7Cagw": 1]),
+        .init(id: .cameraButton, category: .hardware, title: String(localized: "iPhone 16 Camera Control Settings"), detail: String(localized: "Shows Camera Control settings and related capabilities."), values: ["CwvKxM2cEogD3p+HYgaW0Q": 1, "oOV1jhJbdV3AddkcCg0AEA": 1]),
+        .init(id: .pencil, category: .hardware, title: String(localized: "Apple Pencil Settings"), detail: String(localized: "Shows the Apple Pencil settings page."), values: ["yhHcB0iH0d1XzPO/CFd3ow": 1]),
+        .init(id: .actionButton, category: .hardware, title: String(localized: "Action Button Settings"), detail: String(localized: "Shows the Action Button settings page."), values: ["cT44WE1EohiwRzhsZ8xEsw": 1]),
+        .init(id: .collisionSOS, category: .hardware, title: String(localized: "Collision SOS"), detail: String(localized: "Shows collision detection in SOS settings."), values: ["HCzWusHQwZDea6nNhaKndw": 1]),
 
-        .init(id: .stageManager, category: .ipad, title: "台前调度支持", detail: "标记设备支持台前调度。", values: ["qeaj75wk3HF4DwQ8qbIi7g": 1]),
-        .init(id: .iPadApps, category: .ipad, title: "允许安装 iPad App", detail: "在 iPhone 上开放 iPad App 兼容类型。", values: ["9MZ5AdH43csAUajl/dU+IQ": [1, 2]]),
-        .init(id: .iPadOS, category: .ipad, title: "启用 iPadOS 模式", detail: "同时修改五项能力与 CacheData；实验性且风险较高。", values: ["mG0AnH/Vy1veoqoLRAIgTA": 1, "UCG5MkVahJxG1YULbbd5Bg": 1, "ZYqko/XM5zD3XBfN5RmaXA": 1, "nVh/gwNpy7Jv1NOk00CMrw": 1, "uKc7FPnEO++lVhHWHFlGbQ": 1], isRisky: true),
+        .init(id: .stageManager, category: .ipad, title: String(localized: "Stage Manager Support"), detail: String(localized: "Marks the device as supporting Stage Manager."), values: ["qeaj75wk3HF4DwQ8qbIi7g": 1]),
+        .init(id: .iPadApps, category: .ipad, title: String(localized: "Allow iPad Apps"), detail: String(localized: "Enables iPad app compatibility types on iPhone."), values: ["9MZ5AdH43csAUajl/dU+IQ": [1, 2]]),
+        .init(id: .iPadOS, category: .ipad, title: String(localized: "Enable iPadOS Mode"), detail: String(localized: "Changes five capabilities and CacheData; experimental and high risk."), values: ["mG0AnH/Vy1veoqoLRAIgTA": 1, "UCG5MkVahJxG1YULbbd5Bg": 1, "ZYqko/XM5zD3XBfN5RmaXA": 1, "nVh/gwNpy7Jv1NOk00CMrw": 1, "uKc7FPnEO++lVhHWHFlGbQ": 1], isRisky: true),
 
-        .init(id: .disableRegionRestrictions, category: .region, title: "停用地区限制", detail: "写入 US / LL/A，可用于解除强制快门声等限制。", values: ["h63QSdBCiT/z0WU6rdQv6Q": "US", "zHeENZu+wbg7PUprwNwBWg": "LL/A"]),
+        .init(id: .disableRegionRestrictions, category: .region, title: String(localized: "Disable Region Restrictions"), detail: String(localized: "Writes US / LL/A to bypass restrictions such as forced shutter sound."), values: ["h63QSdBCiT/z0WU6rdQv6Q": "US", "zHeENZu+wbg7PUprwNwBWg": "LL/A"]),
 
-        .init(id: .internalInstall, category: .internalFeatures, title: "Apple 内部安装", detail: "开放 Metal HUD 等内部能力，部分系统服务可能异常。", values: ["EqrsVvjcYDdxHBiQmGhAWw": 1], isRisky: true),
-        .init(id: .internalStorage, category: .internalFeatures, title: "内部存储视图", detail: "在存储设置中显示内部文件；部分 iPad 风险较高。", values: ["LBJfwOEzExRxzlAnSuI7eg": 1], isRisky: true),
-        .init(id: .securityResearchDevice, category: .internalFeatures, title: "安全研究设备模式", detail: "标记为 Security Research Device。", values: ["XYlJKKkj2hztRP1NWWnhlw": 1], isRisky: true)
+        .init(id: .internalInstall, category: .internalFeatures, title: String(localized: "Apple Internal Install"), detail: String(localized: "Enables internal capabilities such as Metal HUD; some services may misbehave."), values: ["EqrsVvjcYDdxHBiQmGhAWw": 1], isRisky: true),
+        .init(id: .internalStorage, category: .internalFeatures, title: String(localized: "Internal Storage View"), detail: String(localized: "Shows internal files in Storage settings; high risk on some iPads."), values: ["LBJfwOEzExRxzlAnSuI7eg": 1], isRisky: true),
+        .init(id: .securityResearchDevice, category: .internalFeatures, title: String(localized: "Security Research Device Mode"), detail: String(localized: "Marks the device as a Security Research Device."), values: ["XYlJKKkj2hztRP1NWWnhlw": 1], isRisky: true)
     ]
 
     static func definition(for id: GestaltTweakID) -> GestaltTweakDefinition? {
@@ -83,7 +93,7 @@ struct DynamicIslandOption: Identifiable, Hashable {
     var id: Int { subtype }
 
     static let all: [DynamicIslandOption] = [
-        .init(subtype: 2436, title: "iPhone X 手势（SE）"),
+        .init(subtype: 2436, title: String(localized: "iPhone X Gestures (SE)")),
         .init(subtype: 2556, title: "iPhone 14 Pro"),
         .init(subtype: 2796, title: "iPhone 14 Pro Max"),
         .init(subtype: 2622, title: "iPhone 16 Pro"),
@@ -101,11 +111,11 @@ enum GestaltTweakError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .artworkDictionaryMissing: "MobileGestalt 缺少 ArtworkDevice 字典，无法修改灵动岛或型号名称。"
-        case .cacheDataMissing: "MobileGestalt 缺少 CacheData，无法启用 iPadOS 模式。"
-        case .cacheDataTooShort: "CacheData 长度不足，无法安全应用 iPadOS 模式。"
-        case .cacheDataPatternNotFound: "CacheData 中未找到 Nugget 所需的 iPadOS 标记。"
-        case .invalidCacheDataOffset: "CacheData 标记校验失败，未进行修改。"
+        case .artworkDictionaryMissing: String(localized: "MobileGestalt is missing the ArtworkDevice dictionary, so Dynamic Island or model name cannot be changed.")
+        case .cacheDataMissing: String(localized: "MobileGestalt is missing CacheData, so iPadOS mode cannot be enabled.")
+        case .cacheDataTooShort: String(localized: "CacheData is too short to apply iPadOS mode safely.")
+        case .cacheDataPatternNotFound: String(localized: "The iPadOS marker required by Nugget was not found in CacheData.")
+        case .invalidCacheDataOffset: String(localized: "CacheData marker validation failed. No changes were made.")
         }
     }
 }

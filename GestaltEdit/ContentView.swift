@@ -7,20 +7,20 @@ struct ContentView: View {
     var body: some View {
         TabView {
             TweakWorkbench()
-                .tabItem { Label("工具", systemImage: "switch.2") }
+                .tabItem { Label("Tools", systemImage: "switch.2") }
 
             NavigationStack { AdvancedGestaltEditor() }
-                .tabItem { Label("字段", systemImage: "list.bullet.rectangle") }
+                .tabItem { Label("Fields", systemImage: "list.bullet.rectangle") }
 
             BackupLibrary()
-                .tabItem { Label("备份", systemImage: "archivebox") }
+                .tabItem { Label("Backups", systemImage: "archivebox") }
         }
         .task { viewModel.load() }
         .alert(item: $viewModel.notice) { notice in
             Alert(
                 title: Text(notice.title),
                 message: Text(notice.message),
-                dismissButton: .default(Text("好"))
+                dismissButton: .default(Text("OK"))
             )
         }
     }
@@ -40,7 +40,7 @@ private struct TweakWorkbench: View {
 
                     ForEach(GestaltTweakCategory.allCases) { category in
                         let definitions = GestaltTweakCatalog.definitions.filter { $0.category == category }
-                        Section(category.rawValue) {
+                        Section(category.label) {
                             ForEach(definitions) { definition in
                                 TweakToggle(
                                     definition: definition,
@@ -52,7 +52,7 @@ private struct TweakWorkbench: View {
                             }
                             if category == .region {
                                 Toggle(
-                                    "启用 Siri AI（美国地区）",
+                                    "Enable Siri AI (US Region)",
                                     isOn: Binding(
                                         get: { viewModel.stagesAIRegion },
                                         set: { viewModel.setAIRegion(enabled: $0) }
@@ -82,47 +82,47 @@ private struct TweakWorkbench: View {
                 if viewModel.isBusy || !viewModel.hasAttemptedLoad {
                     ProgressView()
                         .controlSize(.small)
-                    Text("正在读取 MobileGestalt…")
+                    Text("Reading MobileGestalt…")
                 } else {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("无法读取 MobileGestalt")
-                        Button("重新读取", action: viewModel.load)
+                        Text("Unable to read MobileGestalt")
+                        Button("Reload", action: viewModel.load)
                             .font(.footnote)
                     }
                 }
             }
         } else {
             LabeledContent {
-                Text("已连接")
+                Text("Connected")
                     .foregroundStyle(.green)
             } label: {
-                Label(viewModel.aiRegionProfile?.marketingName ?? "当前设备", systemImage: "iphone")
+                Label(viewModel.aiRegionProfile?.marketingName ?? String(localized: "Current Device"), systemImage: "iphone")
             }
         }
     }
 
     private var dynamicIslandSection: some View {
         Section {
-            Picker("设备子类型", selection: $viewModel.dynamicIslandSubtype) {
-                Text("不修改").tag(Int?.none)
+            Picker("Device Subtype", selection: $viewModel.dynamicIslandSubtype) {
+                Text("No Change").tag(Int?.none)
                 ForEach(DynamicIslandOption.all) { option in
                     Text("\(option.subtype) · \(option.title)").tag(Int?.some(option.subtype))
                 }
             }
         } header: {
-            Text("灵动岛")
+            Text("Dynamic Island")
         } footer: {
-            Text("选择后会同时写入 ArtworkDeviceSubType 与灵动岛支持标记。")
+            Text("Selecting a subtype writes ArtworkDeviceSubType and the Dynamic Island support flag.")
         }
     }
 
     private var modelNameSection: some View {
-        Section("设备名称") {
-            Toggle("修改“关于本机”型号名称", isOn: $viewModel.changesModelName)
+        Section("Device Name") {
+            Toggle("Change model name in About", isOn: $viewModel.changesModelName)
             if viewModel.changesModelName {
-                TextField("型号名称", text: $viewModel.modelName)
+                TextField("Model Name", text: $viewModel.modelName)
                     .textInputAutocapitalization(.words)
             }
         }
@@ -131,14 +131,14 @@ private struct TweakWorkbench: View {
     private var applyBar: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text("\(viewModel.stagedChangeCount) 项待写入")
+                Text(String(format: String(localized: "%d pending changes"), viewModel.stagedChangeCount))
                     .font(.subheadline.weight(.semibold))
-                Text("写入前自动备份")
+                Text("Automatic backup before writing")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Button("应用") { viewModel.applySelectedTweaks() }
+            Button("Apply") { viewModel.applySelectedTweaks() }
                 .buttonStyle(.borderedProminent)
                 .disabled(viewModel.isBusy)
         }
@@ -161,7 +161,7 @@ private struct TweakToggle: View {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.caption)
                             .foregroundStyle(.orange)
-                            .accessibilityLabel("高风险")
+                            .accessibilityLabel("High Risk")
                     }
                 }
                 Text(definition.detail)
@@ -185,23 +185,23 @@ private struct BackupLibrary: View {
                     Button {
                         viewModel.createBackup()
                     } label: {
-                        Label("备份当前 MobileGestalt", systemImage: "plus.circle.fill")
+                        Label("Back Up Current MobileGestalt", systemImage: "plus.circle.fill")
                     }
                     .disabled(viewModel.plist == nil || viewModel.isBusy)
 
                     Button {
                         showsBackupImporter = true
                     } label: {
-                        Label("导入备份", systemImage: "square.and.arrow.down")
+                        Label("Import Backup", systemImage: "square.and.arrow.down")
                     }
                     .disabled(viewModel.isBusy)
                 } footer: {
-                    Text("导入只会加入备份库，不会立即写入。每次写入前也会自动保存一份原始 plist。")
+                    Text("Importing only adds a file to the backup library. It does not write immediately. The original plist is also backed up before every write.")
                 }
 
-                Section("本机备份") {
+                Section("Local Backups") {
                     if viewModel.backups.isEmpty {
-                        Label("暂无备份", systemImage: "archivebox")
+                        Label("No Backups", systemImage: "archivebox")
                             .foregroundStyle(.secondary)
                     } else {
                         ForEach(viewModel.backups) { backup in
@@ -215,7 +215,7 @@ private struct BackupLibrary: View {
                     }
                 }
             }
-            .navigationTitle("备份")
+            .navigationTitle("Backups")
             .refreshable { viewModel.refreshBackups() }
             .onAppear { viewModel.refreshBackups() }
             .fileImporter(
@@ -231,20 +231,20 @@ private struct BackupLibrary: View {
                 }
             }
             .confirmationDialog(
-                "恢复这份 MobileGestalt？",
+                "Restore This MobileGestalt Backup?",
                 isPresented: Binding(
                     get: { backupToRestore != nil },
                     set: { if !$0 { backupToRestore = nil } }
                 ),
                 titleVisibility: .visible
             ) {
-                Button("恢复并写入", role: .destructive) {
+                Button("Restore and Write", role: .destructive) {
                     if let backupToRestore { viewModel.restore(backupToRestore) }
                     backupToRestore = nil
                 }
-                Button("取消", role: .cancel) { backupToRestore = nil }
+                Button("Cancel", role: .cancel) { backupToRestore = nil }
             } message: {
-                Text("当前文件会先自动备份；恢复后需要立即强制重启。")
+                Text("The current file will be backed up first. Force restart immediately after restoring.")
             }
         }
     }
@@ -266,12 +266,12 @@ private struct BackupRow: View {
             ShareLink(item: backup.url) {
                 Image(systemName: "square.and.arrow.up")
             }
-            .accessibilityLabel("导出备份")
+            .accessibilityLabel("Export Backup")
             Button(action: restore) {
                 Image(systemName: "arrow.counterclockwise")
             }
             .buttonStyle(.borderless)
-            .accessibilityLabel("恢复备份")
+            .accessibilityLabel("Restore Backup")
         }
     }
 }
@@ -308,7 +308,7 @@ private struct AdvancedGestaltEditor: View {
                 )
 
                 KeySection(
-                    title: "Top Level",
+                    title: String(localized: "Top Level"),
                     keys: topLevelKeys,
                     value: { value(for: PlistKey(section: .topLevel, key: $0)) },
                     select: {
@@ -319,8 +319,8 @@ private struct AdvancedGestaltEditor: View {
                 )
             }
         }
-        .navigationTitle("高级字段编辑")
-        .searchable(text: $searchText, prompt: "搜索 key 或 value")
+        .navigationTitle("Advanced Field Editor")
+        .searchable(text: $searchText, prompt: "Search key or value")
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button {
@@ -328,10 +328,10 @@ private struct AdvancedGestaltEditor: View {
                 } label: {
                     Image(systemName: "plus")
                 }
-                .accessibilityLabel("新增 CacheExtra 字段")
+                .accessibilityLabel("Add CacheExtra Field")
                 .disabled(viewModel.plist == nil || viewModel.isBusy)
 
-                Button("保存", action: viewModel.applyChanges)
+                Button("Save", action: viewModel.applyChanges)
                     .fontWeight(.semibold)
                     .disabled(!viewModel.isDirty || viewModel.isBusy)
             }
@@ -442,9 +442,9 @@ private enum AddFieldError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .emptyKey:
-            "Key 不能为空"
+            String(localized: "Key cannot be empty.")
         case .duplicateKey(let key):
-            "CacheExtra 已存在字段：\(key)"
+            String(format: String(localized: "CacheExtra already contains the field: %@"), key)
         }
     }
 }
@@ -458,7 +458,7 @@ private struct KeySection: View {
     var body: some View {
         Section(title) {
             if keys.isEmpty {
-                Text("没有结果")
+                Text("No Results")
                     .foregroundStyle(.secondary)
             } else {
                 ForEach(keys, id: \.self) { key in
@@ -530,8 +530,8 @@ private struct ValueEditor: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("类型") {
-                    Picker("类型", selection: $kind) {
+                Section("Type") {
+                    Picker("Type", selection: $kind) {
                         ForEach(PlistValueKind.allCases) { kind in
                             Text(kind.label).tag(kind)
                         }
@@ -539,7 +539,7 @@ private struct ValueEditor: View {
                     .pickerStyle(.menu)
                 }
 
-                Section("值") {
+                Section("Value") {
                     TextEditor(text: $text)
                         .font(.system(.body, design: .monospaced))
                         .frame(minHeight: 140)
@@ -556,7 +556,7 @@ private struct ValueEditor: View {
 
                 if delete != nil {
                     Section {
-                        Button("删除字段", role: .destructive) {
+                        Button("Delete Field", role: .destructive) {
                             showsDeleteConfirmation = true
                         }
                         .frame(maxWidth: .infinity)
@@ -567,25 +567,25 @@ private struct ValueEditor: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("取消") { dismiss() }
+                    Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("完成", action: commit)
+                    Button("Done", action: commit)
                         .fontWeight(.semibold)
                 }
             }
             .confirmationDialog(
-                "删除 CacheExtra 字段？",
+                "Delete CacheExtra Field?",
                 isPresented: $showsDeleteConfirmation,
                 titleVisibility: .visible
             ) {
-                Button("删除", role: .destructive) {
+                Button("Delete", role: .destructive) {
                     delete?()
                     dismiss()
                 }
-                Button("取消", role: .cancel) {}
+                Button("Cancel", role: .cancel) {}
             } message: {
-                Text("删除将在返回编辑器并点击“保存”后写入文件。")
+                Text("The field will be removed from the file after you return to the editor and tap Save.")
             }
         }
     }
@@ -613,16 +613,16 @@ private struct AddCacheExtraFieldEditor: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("字段") {
-                    LabeledContent("位置", value: "CacheExtra")
+                Section("Field") {
+                    LabeledContent("Location", value: "CacheExtra")
                     TextField("Key", text: $key)
                         .font(.system(.body, design: .monospaced))
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
                 }
 
-                Section("类型") {
-                    Picker("类型", selection: $kind) {
+                Section("Type") {
+                    Picker("Type", selection: $kind) {
                         ForEach(PlistValueKind.allCases) { kind in
                             Text(kind.label).tag(kind)
                         }
@@ -630,7 +630,7 @@ private struct AddCacheExtraFieldEditor: View {
                     .pickerStyle(.menu)
                 }
 
-                Section("值") {
+                Section("Value") {
                     TextEditor(text: $text)
                         .font(.system(.body, design: .monospaced))
                         .frame(minHeight: 120)
@@ -645,14 +645,14 @@ private struct AddCacheExtraFieldEditor: View {
                     }
                 }
             }
-            .navigationTitle("新增字段")
+            .navigationTitle("Add Field")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("取消") { dismiss() }
+                    Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("添加", action: commit)
+                    Button("Add", action: commit)
                         .fontWeight(.semibold)
                 }
             }
