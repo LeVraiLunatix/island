@@ -30,6 +30,7 @@
 #import <fcntl.h>
 #import <mach/mach.h>
 #import <sys/stat.h>
+#import <sys/sysctl.h>
 #import <unistd.h>
 
 NSString * const GestaltPlistFileName = @"com.apple.MobileGestalt.plist";
@@ -201,6 +202,33 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
     return shared;
 }
 
++ (NSString *)currentOSBuild
+{
+    size_t length = 0;
+    if (sysctlbyname("kern.osversion", NULL, &length, NULL, 0) != 0 ||
+        length == 0) {
+        return @"";
+    }
+
+    NSMutableData *data = [NSMutableData dataWithLength:length];
+    if (sysctlbyname("kern.osversion", data.mutableBytes, &length, NULL, 0) != 0)
+        return @"";
+
+    return [NSString stringWithUTF8String:data.bytes] ?: @"";
+}
+
++ (BOOL)isRunningSupportedOS
+{
+    NSOperatingSystemVersion version = NSProcessInfo.processInfo.operatingSystemVersion;
+    NSString *build = self.currentOSBuild;
+    return version.majorVersion == 27 && (
+        [build isEqualToString:@"24A5355q"] || // iOS 27 beta 1
+        [build isEqualToString:@"24A5370h"] || // iOS 27 beta 2
+        [build isEqualToString:@"24A5380h"] || // iOS 27 beta 3
+        [build isEqualToString:@"24A5390f"]    // iOS 27 beta 4
+    );
+}
+
 - (NSString *)hostBundleIdentifier
 {
     return NSBundle.mainBundle.bundleIdentifier ?: @"(nil)";
@@ -210,6 +238,12 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
 
 - (BOOL)connectWithError:(NSError **)error
 {
+    if (!GestaltAccess.isRunningSupportedOS) {
+        if (error) *error = GestaltError(0, NSLocalizedString(
+            @"GestaltEdit currently supports only iOS 27 beta 1 through beta 4.", nil));
+        return NO;
+    }
+
     if (self.isConnected && _activeLease.activated &&
         self.cacheDirectoryPath.length > 0) {
         if (error) *error = nil;

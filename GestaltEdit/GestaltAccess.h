@@ -25,6 +25,14 @@ extern NSString * const GestaltPlistFileName;
 
 + (instancetype)shared;
 
+/// Returns whether this process is running on an iOS 27 build that GestaltEdit
+/// currently supports (developer beta 1 through beta 4).
++ (BOOL)isRunningSupportedOS;
+
+/// The Darwin build identifier used by the supported-OS check, such as
+/// "24A5390f". An empty string means the build identifier could not be read.
++ (NSString *)currentOSBuild;
+
 @property (nonatomic, readonly) BOOL isConnected;
 @property (nonatomic, readonly) GestaltRoute activeRoute;
 @property (nonatomic, copy, readonly) NSString *routeDescription;

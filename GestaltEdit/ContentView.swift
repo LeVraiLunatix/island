@@ -5,17 +5,23 @@ struct ContentView: View {
     @EnvironmentObject private var viewModel: GestaltViewModel
 
     var body: some View {
-        TabView {
-            TweakWorkbench()
-                .tabItem { Label("Tools", systemImage: "switch.2") }
+        Group {
+            if GestaltAccess.isRunningSupportedOS() {
+                TabView {
+                    TweakWorkbench()
+                        .tabItem { Label("Tools", systemImage: "switch.2") }
 
-            NavigationStack { AdvancedGestaltEditor() }
-                .tabItem { Label("Fields", systemImage: "list.bullet.rectangle") }
+                    NavigationStack { AdvancedGestaltEditor() }
+                        .tabItem { Label("Fields", systemImage: "list.bullet.rectangle") }
 
-            BackupLibrary()
-                .tabItem { Label("Backups", systemImage: "archivebox") }
+                    BackupLibrary()
+                        .tabItem { Label("Backups", systemImage: "archivebox") }
+                }
+                .task { viewModel.load() }
+            } else {
+                UnsupportedOSView()
+            }
         }
-        .task { viewModel.load() }
         .alert(item: $viewModel.notice) { notice in
             Alert(
                 title: Text(notice.title),
@@ -23,6 +29,22 @@ struct ContentView: View {
                 dismissButton: .default(Text("OK"))
             )
         }
+    }
+}
+
+private struct UnsupportedOSView: View {
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "iphone.slash")
+                .font(.system(size: 44))
+                .foregroundStyle(.secondary)
+            Text("Unsupported iOS Version")
+                .font(.title2.weight(.semibold))
+            Text("GestaltEdit currently supports only iOS 27 beta 1 through beta 4.")
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+        }
+        .padding(24)
     }
 }
 

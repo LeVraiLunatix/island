@@ -40,12 +40,12 @@ Importing only copies a file into GestaltEdit's backup library; it does not imme
 
 ## Requirements and signing
 
-- Deployment target: iOS 16.0
+- Supported system versions: iOS 27 beta 1 through beta 4 only
 - Xcode and a signing method that can install apps on the target device
 - Developer Mode enabled on the device
 - Bundle identifier kept as `com.apple.mobile.MobileHouseArrest`
 
-Actual file access depends on the exact iOS build. The current implementation includes the `geod` traversal route used on iOS 26 and the class-13 SystemGroup route available on some iOS 27 builds. Apple may change these private behaviors at any time.
+GestaltEdit checks the running system build before accessing MobileGestalt. The current release accepts only iOS 27 beta 1–4 (24A5355q, 24A5370h, 24A5380h, and 24A5390f). Apple may change these private behaviors at any time.
 
 ## Building
 
