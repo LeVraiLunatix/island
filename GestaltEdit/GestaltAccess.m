@@ -2,28 +2,12 @@
 //  GestaltAccess.m
 //  GestaltEdit
 //
-//  Routes (from the FilzaSlop / bad_query / MobileHouseArrest PoCs):
-//
-//  1. SystemGroup class 13 (iOS 27 style):
-//       class 13, group "systemgroup.com.apple.mobilegestaltcache",
-//       part 3, flags 0x8100000000
-//     -> /private/var/containers/Shared/SystemGroup/
-//          systemgroup.com.apple.mobilegestaltcache/Library/Caches
-//
-//  2. bad_query path traversal (iOS 26 / 27):
+//  bad_query path traversal (iOS 26 / 27):
 //       class 13, MobileGestalt SystemGroup, part 3, target absolute path,
 //       flags 0x8000000000; directly consumes the sandbox token
-//
-//  3. SystemGroup class 13 legacy (older OS without the part API):
-//       class 13, group identifier, part 0, flags 0x900000000
-//
-//  The caller identity (bundle identifier) matters for route 1/3 on some
-//  builds; the class-13 group route is reported to work without the
-//  MobileHouseArrest identity on iOS 27 beta 4.
 
 #import "GestaltAccess.h"
 #import "BadQueryBridge.h"
-#import "MCMBridge.h"
 
 #import <errno.h>
 #import <fcntl.h>
@@ -34,11 +18,6 @@
 
 NSString * const GestaltPlistFileName = @"com.apple.MobileGestalt.plist";
 
-static const uint64_t kMCMFlags = 0x900000000ULL;
-static const uint64_t kMCMReadWritePartFlags = 0x8100000000ULL;
-static const uint64_t kMCMClassSystemGroups = 13;
-static NSString * const kMobileGestaltSystemGroup =
-    @"systemgroup.com.apple.mobilegestaltcache";
 static NSString * const kMobileGestaltCacheDirectory =
     @"/private/var/containers/Shared/SystemGroup/"
      "systemgroup.com.apple.mobilegestaltcache/Library/Caches";
@@ -53,27 +32,10 @@ static NSError *GestaltError(NSInteger code, NSString *message)
                            userInfo:@{ NSLocalizedDescriptionKey: message }];
 }
 
-static NSString *GestaltNormalizePath(NSString *path)
-{
-    NSString *result = path.stringByStandardizingPath;
-    if ([result isEqualToString:@"/var"] || [result hasPrefix:@"/var/"])
-        result = [@"/private" stringByAppendingString:result];
-    return result;
-}
-
 static BOOL GestaltCanOpenReadWrite(NSString *path)
 {
     int fd = open(path.fileSystemRepresentation,
                   O_RDWR | O_CLOEXEC | O_NOFOLLOW);
-    if (fd < 0) return NO;
-    close(fd);
-    return YES;
-}
-
-static BOOL GestaltCanOpenDirectory(NSString *path)
-{
-    int fd = open(path.fileSystemRepresentation,
-                  O_RDONLY | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW);
     if (fd < 0) return NO;
     close(fd);
     return YES;
@@ -182,7 +144,6 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
 
 @interface GestaltAccess ()
 @property (nonatomic, assign, readwrite) BOOL isConnected;
-@property (nonatomic, assign, readwrite) GestaltRoute activeRoute;
 @property (nonatomic, copy, readwrite) NSString *routeDescription;
 @property (nonatomic, copy, readwrite) NSString *cacheDirectoryPath;
 @property (nonatomic, copy, readwrite) NSString *plistPath;
@@ -191,7 +152,6 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
 
 @implementation GestaltAccess
 {
-    MCMLease *_activeLease;
     BadQueryLease *_activeBadQueryLease;
 }
 
@@ -246,24 +206,21 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
         return NO;
     }
 
-    BOOL leaseActive = _activeLease.activated || _activeBadQueryLease.isActive;
-    if (self.isConnected && leaseActive && self.cacheDirectoryPath.length > 0) {
+    if (self.isConnected && _activeBadQueryLease.isActive &&
+        self.cacheDirectoryPath.length > 0) {
         if (error) *error = nil;
         return YES;
     }
 
-    if (!MCMBridgeAvailable() && !BadQueryBridgeAvailable()) {
+    if (!BadQueryBridgeAvailable()) {
         if (error) *error = GestaltError(1, NSLocalizedString(
-            @"ContainerManager bridge is unavailable (the iOS version is too old or libsystem_containermanager is missing).", nil));
+            @"bad_query is unavailable (required ContainerManager or sandbox extension APIs are missing).", nil));
         return NO;
     }
 
-    [_activeLease invalidate];
-    _activeLease = nil;
     [_activeBadQueryLease invalidate];
     _activeBadQueryLease = nil;
     self.isConnected = NO;
-    self.activeRoute = GestaltRouteNone;
     self.routeDescription = @"";
     self.cacheDirectoryPath = nil;
     self.plistPath = nil;
@@ -275,94 +232,25 @@ static kern_return_t GestaltTriggerBackboardRespring(void)
     NSString *badQueryDetail = nil;
     BadQueryLease *badQueryLease = [BadQueryLease leaseForPath:badQueryTarget
                                                         error:&badQueryDetail];
-    if (badQueryLease && GestaltCanOpenReadWrite(badQueryPlist)) {
-        _activeBadQueryLease = badQueryLease;
-        self.isConnected = YES;
-        self.activeRoute = GestaltRouteBadQuery;
-        self.routeDescription = @"bad-query";
-        self.cacheDirectoryPath = kMobileGestaltCacheDirectory;
-        self.plistPath = badQueryPlist;
-        if (error) *error = nil;
-        return YES;
+    if (!badQueryLease) {
+        if (error) *error = GestaltError(2,
+            badQueryDetail ?: NSLocalizedString(@"bad_query failed.", nil));
+        return NO;
     }
-    [badQueryLease invalidate];
-    NSLog(@"[GestaltAccess] route bad-query failed: %@",
-          badQueryDetail ?: @"target plist is not writable");
-
-    NSArray<NSArray *> *routes = @[
-        @[ @"systemgroup-class13-part3",
-           @(kMCMClassSystemGroups), kMobileGestaltSystemGroup, @YES,
-           @3, NSNull.null, @(kMCMReadWritePartFlags) ],
-        @[ @"systemgroup-class13-legacy",
-           @(kMCMClassSystemGroups), kMobileGestaltSystemGroup, @YES,
-           @0, NSNull.null, @(kMCMFlags) ],
-    ];
-
-    for (NSArray *route in routes) {
-        NSString *name = route[0];
-        uint64_t containerClass = [route[1] unsignedLongLongValue];
-        NSString *identifier = route[2];
-        BOOL group = [route[3] boolValue];
-        uint64_t part = [route[4] unsignedLongLongValue];
-        id partDomainValue = route[5];
-        NSString *partDomain =
-            [partDomainValue isKindOfClass:NSString.class] ? partDomainValue : nil;
-        uint64_t flags = [route[6] unsignedLongLongValue];
-
-        NSString *detail = nil;
-        MCMLease *lease = [MCMLease leaseForClass:containerClass
-                                       identifier:identifier
-                                            group:group
-                                             part:part
-                                       partDomain:partDomain
-                                            flags:flags
-                                            error:&detail];
-        BOOL activated = lease && [lease activate:&detail];
-        if (!lease || !activated) {
-            [lease invalidate];
-            NSLog(@"[GestaltAccess] route %@ failed: %@", name,
-                  detail ?: @"activation failed");
-            continue;
-        }
-
-        NSString *root = GestaltNormalizePath(lease.rootPath);
-        NSString *cachesDir = root;
-        if (![cachesDir hasSuffix:@"Library/Caches"])
-            cachesDir = [root stringByAppendingPathComponent:@"Library/Caches"];
-        NSString *plist = [cachesDir stringByAppendingPathComponent:
-            GestaltPlistFileName];
-
-        if (!GestaltCanOpenDirectory(cachesDir)) {
-            NSLog(@"[GestaltAccess] route %@ directory not openable: %@",
-                  name, cachesDir);
-            [lease invalidate];
-            continue;
-        }
-
-        BOOL plistExists = [[NSFileManager defaultManager]
-            fileExistsAtPath:plist];
-        if (plistExists && !GestaltCanOpenReadWrite(plist)) {
-            NSLog(@"[GestaltAccess] route %@ plist not writable: %@",
-                  name, plist);
-            [lease invalidate];
-            continue;
-        }
-
-        _activeLease = lease;
-        self.isConnected = YES;
-        self.activeRoute = [name isEqualToString:@"systemgroup-class13-legacy"]
-            ? GestaltRouteSystemGroupLegacy
-            : GestaltRouteSystemGroupClass13;
-        self.routeDescription = name;
-        self.cacheDirectoryPath = cachesDir;
-        self.plistPath = plist;
-        if (error) *error = nil;
-        return YES;
+    if (!GestaltCanOpenReadWrite(badQueryPlist)) {
+        [badQueryLease invalidate];
+        if (error) *error = GestaltError(3, NSLocalizedString(
+            @"bad_query acquired a sandbox extension, but the MobileGestalt plist is not writable.", nil));
+        return NO;
     }
 
-    if (error) *error = GestaltError(2, NSLocalizedString(
-        @"All ContainerManager routes failed. This system does not expose read/write access to the MobileGestalt cache directory. The path-based bad_query route and the direct class-13 routes were rejected.", nil));
-    return NO;
+    _activeBadQueryLease = badQueryLease;
+    self.isConnected = YES;
+    self.routeDescription = @"bad-query";
+    self.cacheDirectoryPath = kMobileGestaltCacheDirectory;
+    self.plistPath = badQueryPlist;
+    if (error) *error = nil;
+    return YES;
 }
 
 #pragma mark - Read / Write

@@ -146,8 +146,9 @@
 "The iPadOS marker required by Nugget was not found in CacheData." = "在 CacheData 中找不到 Nugget 所需的 iPadOS 标记。";
 "CacheData marker validation failed. No changes were made." = "CacheData 标记验证失败，未进行任何更改。";
 
-"ContainerManager bridge is unavailable (the iOS version is too old or libsystem_containermanager is missing)." = "ContainerManager 桥接不可用（iOS 版本过旧或缺少 libsystem_containermanager）。";
-"All ContainerManager routes failed. This system does not expose read/write access to the MobileGestalt cache directory. The path-based bad_query route and the direct class-13 routes were rejected." = "所有 ContainerManager 路径均失败。此系统未开放 MobileGestalt 缓存目录的读写权限。基于路径的 bad_query 路径和 class-13 直接路径均被拒绝。";
+"bad_query is unavailable (required ContainerManager or sandbox extension APIs are missing)." = "bad_query 不可用（缺少所需的 ContainerManager 或沙盒扩展 API）。";
+"bad_query failed." = "bad_query 失败。";
+"bad_query acquired a sandbox extension, but the MobileGestalt plist is not writable." = "bad_query 已取得沙盒扩展，但 MobileGestalt plist 仍不可写。";
 "The plist does not exist: %@" = "plist 不存在：%@";
 "Failed to read the plist." = "读取 plist 失败。";
 "The plist top level is not a dictionary." = "plist 顶层不是字典。";

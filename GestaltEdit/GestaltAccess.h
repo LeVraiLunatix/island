@@ -2,22 +2,14 @@
 //  GestaltAccess.h
 //  GestaltEdit
 //
-//  High-level service that acquires a read/write sandbox extension for the
-//  MobileGestalt cache directory through the ContainerManager routes
-//  described in the FilzaSlop / bad_query / MobileHouseArrest PoCs, then
-//  reads, edits, saves and backs up com.apple.MobileGestalt.plist.
+//  High-level service that uses bad_query to acquire a read/write sandbox
+//  extension, then reads, edits, saves and backs up
+//  com.apple.MobileGestalt.plist.
 //
 
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
-
-typedef NS_ENUM(NSInteger, GestaltRoute) {
-    GestaltRouteNone = 0,
-    GestaltRouteSystemGroupClass13,   // class 13 + part 3 + read/write flags
-    GestaltRouteSystemGroupLegacy,    // class 13, part 0 (older OS)
-    GestaltRouteBadQuery              // bad_query path-based sandbox extension
-};
 
 extern NSString * const GestaltPlistFileName;
 
@@ -34,14 +26,12 @@ extern NSString * const GestaltPlistFileName;
 + (NSString *)currentOSBuild;
 
 @property (nonatomic, readonly) BOOL isConnected;
-@property (nonatomic, readonly) GestaltRoute activeRoute;
 @property (nonatomic, copy, readonly) NSString *routeDescription;
 @property (nonatomic, copy, readonly) NSString *cacheDirectoryPath;
 @property (nonatomic, copy, readonly) NSString *plistPath;
 @property (nonatomic, copy, readonly) NSString *hostBundleIdentifier;
 
-/// Acquires a lease and activates the sandbox extension, then verifies the
-/// cache directory and plist are accessible. Idempotent.
+/// Acquires a bad_query lease and verifies the plist is writable. Idempotent.
 - (BOOL)connectWithError:(NSError **)error;
 
 /// Reads and parses the live plist. Detects the on-disk format (XML/binary).
