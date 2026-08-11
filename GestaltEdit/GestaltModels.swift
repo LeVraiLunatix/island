@@ -173,7 +173,7 @@ struct GestaltNotice: Identifiable {
     var title: String {
         switch kind {
         case .error: String(localized: "Operation Failed")
-        case .restartRequired: String(localized: "Write Complete")
+        case .restartRequired: String(localized: "Restart iPhone")
         case .backupCreated: String(localized: "Backup Complete")
         case .riskWarning: String(localized: "High Risk")
         }

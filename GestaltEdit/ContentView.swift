@@ -376,7 +376,7 @@ private struct BackupLibrary: View {
                 }
                 Button("Cancel", role: .cancel) { backupToRestore = nil }
             } message: {
-                Text("The current file will be backed up first. Force restart immediately after restoring.")
+                Text("The current file will be backed up first. Restart iPhone after restoring.")
             }
         }
     }

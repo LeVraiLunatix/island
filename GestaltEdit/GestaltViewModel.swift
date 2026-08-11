@@ -275,7 +275,7 @@ final class GestaltViewModel: ObservableObject {
             refreshBackups()
             notice = GestaltNotice(
                 kind: .restartRequired,
-                message: String(localized: "Changes were written and verified, and the original file was backed up automatically. Force restart now: quickly press Volume Up, quickly press Volume Down, then hold the Side button until the Apple logo appears. Do not use a normal shutdown/restart.")
+                message: String(localized: "Changes were written and verified, and the original file was backed up automatically. Please restart iPhone.")
             )
         } catch {
             isDirty = true
