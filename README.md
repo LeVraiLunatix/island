@@ -43,7 +43,7 @@ Importing only copies a file into GestaltEdit's backup library; it does not imme
 - Supported system versions: iOS 27 beta 1 through beta 4 only
 - Xcode and a signing method that can install apps on the target device
 - Developer Mode enabled on the device
-- Bundle identifier kept as `com.apple.mobile.MobileHouseArrest`
+- Bundle identifier: `me.ssus.gestaltedit`
 
 GestaltEdit checks the running system build before accessing MobileGestalt. The current release accepts only iOS 27 beta 1–4 (24A5355q, 24A5370h, 24A5380h, and 24A5390f). Apple may change these private behaviors at any time.
 
