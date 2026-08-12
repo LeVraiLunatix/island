@@ -23,6 +23,11 @@ struct ContentView: View {
                 UnsupportedOSView()
             }
         }
+        .overlay {
+            if viewModel.isRespringing {
+                NeoSpringView()
+            }
+        }
         .alert(item: $viewModel.notice) { notice in
             Alert(
                 title: Text(notice.title),
@@ -376,7 +381,7 @@ private struct BackupLibrary: View {
                 }
                 Button("Cancel", role: .cancel) { backupToRestore = nil }
             } message: {
-                Text("The current file will be backed up first. Restart iPhone after restoring.")
+                Text("The current file will be backed up first. SpringBoard will refresh automatically after restoring.")
             }
         }
     }

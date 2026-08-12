@@ -40,7 +40,7 @@
 "Restore This MobileGestalt Backup?" = "恢复这份 MobileGestalt 备份？";
 "Restore and Write" = "恢复并写入";
 "Cancel" = "取消";
-"The current file will be backed up first. Restart iPhone after restoring." = "恢复前会先备份当前文件。恢复完成后请重启 iPhone。";
+"The current file will be backed up first. SpringBoard will refresh automatically after restoring." = "恢复前会先备份当前文件。恢复完成后会自动刷新 SpringBoard。";
 "Export Backup" = "导出备份";
 "Restore Backup" = "恢复备份";
 
@@ -129,11 +129,9 @@
 
 "Operation Failed" = "操作失败";
 "Write Complete" = "写入完成";
-"Restart iPhone" = "重启 iPhone";
 "Backup Complete" = "备份完成";
 "Saved %@.plist. You can export it from the Backups tab." = "已保存 %@.plist，可在“备份”标签页中导出。";
 "Imported %@ and saved it as %@.plist." = "已导入 %@，并保存为 %@.plist。";
-"Changes were written and verified, and the original file was backed up automatically. Please restart iPhone." = "更改已写入并验证，原始文件也已自动备份。请重启 iPhone。";
 "The MobileGestalt plist is not a valid dictionary." = "MobileGestalt plist 不是有效的字典。";
 "The backup is not a valid MobileGestalt plist." = "该备份不是有效的 MobileGestalt plist。";
 "The MobileGestalt values after writing do not match the expected values." = "写入后的 MobileGestalt 值与预期不一致。";

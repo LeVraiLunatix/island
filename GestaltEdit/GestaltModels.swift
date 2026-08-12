@@ -164,7 +164,7 @@ struct AIRegionConfiguration: Equatable {
 }
 
 struct GestaltNotice: Identifiable {
-    enum Kind { case error, restartRequired, backupCreated, riskWarning }
+    enum Kind { case error, backupCreated, riskWarning }
 
     let id = UUID()
     let kind: Kind
@@ -173,7 +173,6 @@ struct GestaltNotice: Identifiable {
     var title: String {
         switch kind {
         case .error: String(localized: "Operation Failed")
-        case .restartRequired: String(localized: "Restart iPhone")
         case .backupCreated: String(localized: "Backup Complete")
         case .riskWarning: String(localized: "High Risk")
         }

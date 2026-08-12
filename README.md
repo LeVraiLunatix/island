@@ -25,6 +25,7 @@ Presets follow Nugget's staged-apply model: toggles represent changes for the ne
 - Edit String, Integer, Float, Boolean, Data, Array, and Dictionary values
 - Add or remove `CacheExtra` fields
 - Read the file back after saving to verify the write
+- Automatically respring after a verified write so changes take effect without a manual restart
 
 ### Backups
 
@@ -80,7 +81,7 @@ IPA files, certificates, provisioning profiles, development team identifiers, an
 2. Select the desired changes on the Tools tab and tap Apply.
 3. Use the Fields tab when you need precise plist editing.
 4. Create, import, export, or restore backups from the Backups tab.
-5. After a successful write or restore, restart the device for the changes to take effect.
+5. After a successful write or restore, GestaltEdit automatically refreshes SpringBoard so the changes take effect.
 
 ## Credits
 
@@ -88,6 +89,7 @@ IPA files, certificates, provisioning profiles, development team identifiers, an
 - [FilzaSlop](https://github.com/0xjohnnydev/FilzaSlop) — ContainerManager file-access research
 - [bad_query](https://github.com/forcequitOS/bad_query) — path-based ContainerManager sandbox escape
 - [0xJohnny](https://x.com/0xjohnny) — MobileHouseArrest / ContainerManager proof of concept
+- [neospring](https://github.com/rooootdev/neospring) — WebKit respring implementation
 
 GestaltEdit is an independent implementation and is not affiliated with Apple or the projects listed above.
 

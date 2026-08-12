@@ -14,6 +14,7 @@ final class GestaltViewModel: ObservableObject {
     @Published var changesModelName = false
     @Published var modelName = ""
     @Published var stagesAIRegion = false
+    @Published private(set) var isRespringing = false
 
     private let access = GestaltAccess.shared()
 
@@ -270,15 +271,13 @@ final class GestaltViewModel: ObservableObject {
             isDirty = false
             completion?()
             refreshBackups()
-            notice = GestaltNotice(
-                kind: .restartRequired,
-                message: String(localized: "Changes were written and verified, and the original file was backed up automatically. Please restart iPhone.")
-            )
+            isBusy = false
+            isRespringing = true
         } catch {
             isDirty = true
             report(error)
+            isBusy = false
         }
-        isBusy = false
     }
 
     private func report(_ error: Error) {
