@@ -16,7 +16,7 @@ struct ContentView: View {
                         .tabItem { Label("Fields", systemImage: "list.bullet.rectangle") }
 
                     BackupLibrary()
-                        .tabItem { Label("Backups", systemImage: "archivebox") }
+                        .tabItem { Label("Restore", systemImage: "archivebox") }
                 }
                 .task { viewModel.load() }
             } else {
@@ -352,7 +352,7 @@ private struct BackupLibrary: View {
                     }
                 }
             }
-            .navigationTitle("Backups")
+            .navigationTitle("Restore")
             .refreshable { viewModel.refreshBackups() }
             .onAppear { viewModel.refreshBackups() }
             .fileImporter(
@@ -404,10 +404,10 @@ private struct BackupRow: View {
                 Image(systemName: "square.and.arrow.up")
             }
             .accessibilityLabel("Export Backup")
-            Button(action: restore) {
-                Image(systemName: "arrow.counterclockwise")
-            }
-            .buttonStyle(.borderless)
+            Button("Restore", action: restore)
+            .buttonStyle(.borderedProminent)
+            .buttonBorderShape(.capsule)
+            .controlSize(.small)
             .accessibilityLabel("Restore Backup")
         }
     }
