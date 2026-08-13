@@ -82,8 +82,8 @@ private struct TweakWorkbench: View {
                     } label: {
                         Label {
                             VStack(alignment: .leading, spacing: 3) {
-                                Text("Support the Developer")
-                                Text("Scan the reward code to support SUSS")
+                                Text("打赏开发者")
+                                Text("扫描赞赏码支持 SUSS")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
@@ -266,11 +266,11 @@ private struct RewardCodeView: View {
                     .shadow(color: .black.opacity(0.12), radius: 18, y: 8)
                     .accessibilityLabel("SUSS Reward Code")
 
-                Text("Thank you for supporting SUSS")
+                Text("感谢你对 SUSS 的支持")
                     .font(.headline)
                     .multilineTextAlignment(.center)
 
-                Text("Open WeChat and scan the code above")
+                Text("打开微信扫描上方赞赏码")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -280,7 +280,7 @@ private struct RewardCodeView: View {
             .frame(maxWidth: .infinity)
         }
         .background(Color(uiColor: .systemGroupedBackground))
-        .navigationTitle("Support SUSS")
+        .navigationTitle("打赏 SUSS")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
