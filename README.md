@@ -1,6 +1,6 @@
 # GestaltEdit
 
-GestaltEdit is a native SwiftUI MobileGestalt utility that runs directly on iPhone and iPad. It reads the device's `com.apple.MobileGestalt.plist` and provides common capability presets, a complete field editor, and backup/import/restore workflows.
+GestaltEdit is a MobileGestalt utility that runs directly on iPhone and iPad. It reads the device's `com.apple.MobileGestalt.plist` and provides common capability presets, a complete field editor, and backup/import/restore workflows.
 
 > [!WARNING]
 > This project uses private APIs and modifies system cache data. Incorrect MobileGestalt values can break system features or UI behavior and may require restoring the device. Use it only on devices you own or are authorized to manage.
