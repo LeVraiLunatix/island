@@ -1,6 +1,14 @@
+<div align="center">
+
+<img src="docs/icon.png" alt="GestaltEdit app icon" width="128" height="128">
+
 # GestaltEdit
 
+**A MobileGestalt utility that runs directly on iPhone and iPad**
+
 <a href="https://trendshift.io/repositories/128548?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-128548" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/128548/daily?language=Swift" alt="frs0n%2FGestaltEdit | Trendshift" width="250" height="55"/></a>
+
+</div>
 
 GestaltEdit is a MobileGestalt utility that runs directly on iPhone and iPad. It reads the device's `com.apple.MobileGestalt.plist` and provides common capability presets, a complete field editor, and backup/import/restore workflows.
 
