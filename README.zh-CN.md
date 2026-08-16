@@ -1,0 +1,133 @@
+<div align="center">
+
+<img src="docs/icon.png" alt="GestaltEdit 应用图标" width="128" height="128">
+
+# GestaltEdit
+
+**直接在 iPhone 和 iPad 上运行的 MobileGestalt 工具**
+
+<a href="https://trendshift.io/repositories/128548?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-128548" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/128548/daily?language=Swift" alt="frs0n%2FGestaltEdit | Trendshift" width="250" height="55"/></a>
+
+<p>
+  <a href="https://github.com/frs0n/GestaltEdit/releases/latest"><img src="https://img.shields.io/github/v/release/frs0n/GestaltEdit?style=flat-square&label=release&color=6E56CF" alt="最新版本"></a>
+  <a href="https://github.com/frs0n/GestaltEdit/releases"><img src="https://img.shields.io/github/downloads/frs0n/GestaltEdit/total?style=flat-square&label=downloads&color=6E56CF" alt="下载量"></a>
+  <a href="https://github.com/frs0n/GestaltEdit/stargazers"><img src="https://img.shields.io/github/stars/frs0n/GestaltEdit?style=flat-square&color=6E56CF" alt="Stars"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/frs0n/GestaltEdit?style=flat-square&color=6E56CF" alt="MIT 许可证"></a>
+  <br>
+  <img src="https://img.shields.io/badge/platform-iOS%20%7C%20iPadOS%2027-000000?style=flat-square&logo=apple&logoColor=white" alt="支持平台">
+  <img src="https://img.shields.io/badge/Swift-SwiftUI-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift">
+  <a href="https://github.com/frs0n/GestaltEdit/issues"><img src="https://img.shields.io/github/issues/frs0n/GestaltEdit?style=flat-square&color=6E56CF" alt="Issues"></a>
+</p>
+
+<a href="https://github.com/frs0n/GestaltEdit/releases/latest"><b>下载最新 IPA</b></a> ·
+<a href="#系统要求与签名">系统要求</a> ·
+<a href="#编译">编译</a> ·
+<a href="#使用方法">使用方法</a>
+
+**简体中文** · <a href="README.md">English</a>
+
+</div>
+
+GestaltEdit 是一款直接在 iPhone 和 iPad 上运行的 MobileGestalt 工具。它读取设备的 `com.apple.MobileGestalt.plist`，提供常用功能预设、完整的字段编辑器，以及备份 / 导入 / 恢复流程。
+
+| | |
+| --- | --- |
+| **功能预设** | 灵动岛、息屏显示、台前调度、Apple Pencil 等一键开关 |
+| **字段编辑器** | 搜索并编辑 `CacheExtra` 与顶层的每一个键，写入后自动回读校验 |
+| **备份** | 每次写入前自动快照，并支持导入、导出与恢复 |
+| **纯设备端** | 无需电脑、无需侧载主机、无需连线——全部在手机上完成 |
+
+> [!WARNING]
+> 本项目使用私有 API 并修改系统缓存数据。错误的 MobileGestalt 取值可能破坏系统功能或界面行为，严重时需要刷机恢复。请仅在你本人拥有或已获授权管理的设备上使用。
+
+## 功能
+
+### MobileGestalt 预设
+
+- 灵动岛设备子类型与备用支持标志
+- 「关于本机」中显示的设备型号名称
+- 开关机铃声、充电限制、轻点唤醒与相机控制设置
+- Apple Pencil、操作按钮与车祸检测设置
+- 息屏显示、AOD 鲜明度、壁纸视差与液态玻璃低性能模式
+- 台前调度、iPad 应用兼容性，以及 Nugget 的 iPadOS `CacheData` 补丁
+- Siri AI 美区、Apple 内部安装、内部存储与安全研究设备模式
+
+预设沿用 Nugget 的暂存应用模型：开关代表下一次写入的改动，所有已选改动由底部的「应用」按钮统一提交。写入成功后选择项会被清空。写入值相互冲突的选项之间互斥。
+
+### 字段编辑器
+
+- 在 `CacheExtra` 与 plist 顶层搜索键和值
+- 编辑 String、Integer、Float、Boolean、Data、Array 与 Dictionary 类型的值
+- 添加或删除 `CacheExtra` 字段
+- 保存后回读文件以校验写入结果
+- 校验通过后自动注销，改动无需手动重启即可生效
+
+### 备份
+
+- 手动备份当前的 MobileGestalt 文件
+- 每次写入前自动保留原始 plist
+- 通过系统文件选择器导入 `.plist` 文件
+- 导入前校验顶层字典与 `CacheExtra`
+- 导出、恢复与删除本地备份
+
+导入只会把文件拷贝进 GestaltEdit 的备份库，并不会立即修改系统文件。恢复时会先备份当前文件，再写入所选备份。
+
+## 系统要求与签名
+
+- 支持的系统版本：仅 iOS 与 iPadOS 27 beta 1 至 beta 4
+- Xcode，以及一种可以把应用安装到目标设备的签名方式
+- 设备已开启开发者模式
+- Bundle identifier：`me.ssus.gestaltedit`
+
+GestaltEdit 在访问 MobileGestalt 前会检查当前系统版本号。当前版本接受 iOS 与 iPadOS 27 beta 1–4（24A5355q、24A5370h、24A5380h、24A5390f），以及 iPadOS beta 3 的修订版本 24A5380i。Apple 随时可能改变这些私有行为。
+
+## 编译
+
+在 Xcode 中打开 `GestaltEdit.xcodeproj`，为目标选择你自己的开发团队，然后编译。也可以使用命令行：
+
+```sh
+xcodebuild \
+  -project GestaltEdit.xcodeproj \
+  -scheme GestaltEdit \
+  -configuration Release \
+  -destination 'generic/platform=iOS' \
+  DEVELOPMENT_TEAM=YOUR_TEAM_ID \
+  build
+```
+
+若只想在不签名的情况下验证源码：
+
+```sh
+xcodebuild \
+  -project GestaltEdit.xcodeproj \
+  -scheme GestaltEdit \
+  -sdk iphoneos \
+  -destination 'generic/platform=iOS' \
+  CODE_SIGNING_ALLOWED=NO \
+  CODE_SIGNING_REQUIRED=NO \
+  build
+```
+
+IPA 文件、证书、描述文件、开发团队标识以及本地 Xcode 用户数据均已被有意排除在仓库之外。
+
+## 使用方法
+
+1. 安装并打开 GestaltEdit，等待它读取 MobileGestalt。
+2. 在「工具」标签页勾选需要的改动，然后点击「应用」。
+3. 需要精确编辑 plist 时，使用「字段」标签页。
+4. 在「备份」标签页创建、导入、导出或恢复备份。
+5. 写入或恢复成功后，GestaltEdit 会自动刷新 SpringBoard，使改动生效。
+
+## 致谢
+
+- [Nugget](https://github.com/leminlimez/Nugget) —— MobileGestalt 预设与 iPadOS `CacheData` 思路
+- [FilzaSlop](https://github.com/0xjohnnydev/FilzaSlop) —— ContainerManager 文件访问研究
+- [bad_query](https://github.com/forcequitOS/bad_query) —— 基于路径的 ContainerManager 沙盒逃逸
+- [0xJohnny](https://x.com/0xjohnny) —— MobileHouseArrest / ContainerManager 概念验证
+- [neospring](https://github.com/rooootdev/neospring) —— WebKit 注销实现
+
+GestaltEdit 是独立实现的项目，与 Apple 及上述项目均无隶属关系。
+
+## 许可证
+
+[MIT License](LICENSE)

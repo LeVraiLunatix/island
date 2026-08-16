@@ -24,6 +24,8 @@
 <a href="#building">Building</a> ·
 <a href="#usage">Usage</a>
 
+**English** · <a href="README.zh-CN.md">简体中文</a>
+
 </div>
 
 GestaltEdit is a MobileGestalt utility that runs directly on iPhone and iPad. It reads the device's `com.apple.MobileGestalt.plist` and provides common capability presets, a complete field editor, and backup/import/restore workflows.
