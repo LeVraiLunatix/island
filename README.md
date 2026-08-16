@@ -12,30 +12,19 @@
   <a href="https://github.com/frs0n/GestaltEdit/releases/latest"><img src="https://img.shields.io/github/v/release/frs0n/GestaltEdit?style=flat-square&label=release&color=6E56CF" alt="Latest release"></a>
   <a href="https://github.com/frs0n/GestaltEdit/releases"><img src="https://img.shields.io/github/downloads/frs0n/GestaltEdit/total?style=flat-square&label=downloads&color=6E56CF" alt="Downloads"></a>
   <a href="https://github.com/frs0n/GestaltEdit/stargazers"><img src="https://img.shields.io/github/stars/frs0n/GestaltEdit?style=flat-square&color=6E56CF" alt="Stars"></a>
+  <img src="https://img.shields.io/badge/iOS%20%7C%20iPadOS-27-000000?style=flat-square&logo=apple&logoColor=white" alt="Platform">
   <a href="LICENSE"><img src="https://img.shields.io/github/license/frs0n/GestaltEdit?style=flat-square&color=6E56CF" alt="MIT License"></a>
-  <br>
-  <img src="https://img.shields.io/badge/platform-iOS%20%7C%20iPadOS%2027-000000?style=flat-square&logo=apple&logoColor=white" alt="Platform">
-  <img src="https://img.shields.io/badge/Swift-SwiftUI-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift">
-  <a href="https://github.com/frs0n/GestaltEdit/issues"><img src="https://img.shields.io/github/issues/frs0n/GestaltEdit?style=flat-square&color=6E56CF" alt="Issues"></a>
 </p>
 
-<a href="https://github.com/frs0n/GestaltEdit/releases/latest"><b>Download the latest IPA</b></a> ·
+<a href="https://github.com/frs0n/GestaltEdit/releases/latest"><b>Download IPA</b></a> ·
 <a href="#requirements-and-signing">Requirements</a> ·
 <a href="#building">Building</a> ·
-<a href="#usage">Usage</a>
-
-**English** · <a href="README.zh-CN.md">简体中文</a>
+<a href="#usage">Usage</a> ·
+<a href="README.zh-CN.md">简体中文</a>
 
 </div>
 
-GestaltEdit is a MobileGestalt utility that runs directly on iPhone and iPad. It reads the device's `com.apple.MobileGestalt.plist` and provides common capability presets, a complete field editor, and backup/import/restore workflows.
-
-| | |
-| --- | --- |
-| **Presets** | One-tap toggles for Dynamic Island, Always-On Display, Stage Manager, Apple Pencil, and more |
-| **Field editor** | Search and edit every `CacheExtra` and top-level key, with write-back verification |
-| **Backups** | Automatic pre-write snapshots, plus import, export, and restore |
-| **On-device** | No computer, no sideload host, no tethering — everything runs on the phone |
+GestaltEdit is a MobileGestalt utility that runs directly on iPhone and iPad — no computer, no sideload host, no tethering. It reads the device's `com.apple.MobileGestalt.plist` and provides common capability presets, a complete field editor, and backup/import/restore workflows.
 
 > [!WARNING]
 > This project uses private APIs and modifies system cache data. Incorrect MobileGestalt values can break system features or UI behavior and may require restoring the device. Use it only on devices you own or are authorized to manage.

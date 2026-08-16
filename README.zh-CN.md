@@ -12,30 +12,19 @@
   <a href="https://github.com/frs0n/GestaltEdit/releases/latest"><img src="https://img.shields.io/github/v/release/frs0n/GestaltEdit?style=flat-square&label=release&color=6E56CF" alt="最新版本"></a>
   <a href="https://github.com/frs0n/GestaltEdit/releases"><img src="https://img.shields.io/github/downloads/frs0n/GestaltEdit/total?style=flat-square&label=downloads&color=6E56CF" alt="下载量"></a>
   <a href="https://github.com/frs0n/GestaltEdit/stargazers"><img src="https://img.shields.io/github/stars/frs0n/GestaltEdit?style=flat-square&color=6E56CF" alt="Stars"></a>
+  <img src="https://img.shields.io/badge/iOS%20%7C%20iPadOS-27-000000?style=flat-square&logo=apple&logoColor=white" alt="支持平台">
   <a href="LICENSE"><img src="https://img.shields.io/github/license/frs0n/GestaltEdit?style=flat-square&color=6E56CF" alt="MIT 许可证"></a>
-  <br>
-  <img src="https://img.shields.io/badge/platform-iOS%20%7C%20iPadOS%2027-000000?style=flat-square&logo=apple&logoColor=white" alt="支持平台">
-  <img src="https://img.shields.io/badge/Swift-SwiftUI-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift">
-  <a href="https://github.com/frs0n/GestaltEdit/issues"><img src="https://img.shields.io/github/issues/frs0n/GestaltEdit?style=flat-square&color=6E56CF" alt="Issues"></a>
 </p>
 
-<a href="https://github.com/frs0n/GestaltEdit/releases/latest"><b>下载最新 IPA</b></a> ·
+<a href="https://github.com/frs0n/GestaltEdit/releases/latest"><b>下载 IPA</b></a> ·
 <a href="#系统要求与签名">系统要求</a> ·
 <a href="#编译">编译</a> ·
-<a href="#使用方法">使用方法</a>
-
-**简体中文** · <a href="README.md">English</a>
+<a href="#使用方法">使用方法</a> ·
+<a href="README.md">English</a>
 
 </div>
 
-GestaltEdit 是一款直接在 iPhone 和 iPad 上运行的 MobileGestalt 工具。它读取设备的 `com.apple.MobileGestalt.plist`，提供常用功能预设、完整的字段编辑器，以及备份 / 导入 / 恢复流程。
-
-| | |
-| --- | --- |
-| **功能预设** | 灵动岛、息屏显示、台前调度、Apple Pencil 等一键开关 |
-| **字段编辑器** | 搜索并编辑 `CacheExtra` 与顶层的每一个键，写入后自动回读校验 |
-| **备份** | 每次写入前自动快照，并支持导入、导出与恢复 |
-| **纯设备端** | 无需电脑、无需侧载主机、无需连线——全部在手机上完成 |
+GestaltEdit 是一款直接在 iPhone 和 iPad 上运行的 MobileGestalt 工具——无需电脑、无需侧载主机、无需连线。它读取设备的 `com.apple.MobileGestalt.plist`，提供常用功能预设、完整的字段编辑器，以及备份 / 导入 / 恢复流程。
 
 > [!WARNING]
 > 本项目使用私有 API 并修改系统缓存数据。错误的 MobileGestalt 取值可能破坏系统功能或界面行为，严重时需要刷机恢复。请仅在你本人拥有或已获授权管理的设备上使用。
