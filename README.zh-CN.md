@@ -7,6 +7,7 @@
 **直接在 iPhone 和 iPad 上运行的 MobileGestalt 工具**
 
 <a href="https://trendshift.io/repositories/128548?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-128548" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/128548/daily?language=Swift" alt="frs0n%2FGestaltEdit | Trendshift" width="250" height="55"/></a>
+<a href="https://trendshift.io/repositories/128548?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-128548" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/128548/weekly?language=Swift" alt="frs0n%2FGestaltEdit | Trendshift" width="250" height="55"/></a>
 
 <p>
   <a href="https://github.com/frs0n/GestaltEdit/releases/latest"><img src="https://img.shields.io/github/v/release/frs0n/GestaltEdit?style=flat-square&label=release&color=6E56CF" alt="最新版本"></a>
@@ -18,7 +19,7 @@
 
 <a href="https://github.com/frs0n/GestaltEdit/releases/latest"><b>下载 IPA</b></a> ·
 <a href="#系统要求与签名">系统要求</a> ·
-<a href="#编译">编译</a> ·
+<a href="#使用-iloader-签名安装">安装</a> ·
 <a href="#使用方法">使用方法</a> ·
 <a href="README.md">English</a>
 
@@ -28,6 +29,9 @@ GestaltEdit 是一款直接在 iPhone 和 iPad 上运行的 MobileGestalt 工具
 
 > [!WARNING]
 > 本项目使用私有 API 并修改系统缓存数据。错误的 MobileGestalt 取值可能破坏系统功能或界面行为，严重时需要刷机恢复。请仅在你本人拥有或已获授权管理的设备上使用。
+
+> [!IMPORTANT]
+> 本项目完全免费、开源，严禁以任何形式售卖本 App 或其二次打包、修改版本。如发现有人售卖，请举报。
 
 ## 功能
 
@@ -64,40 +68,21 @@ GestaltEdit 是一款直接在 iPhone 和 iPad 上运行的 MobileGestalt 工具
 ## 系统要求与签名
 
 - 支持的系统版本：仅 iOS 与 iPadOS 27 beta 1 至 beta 4
-- Xcode，以及一种可以把应用安装到目标设备的签名方式
+- 一种可以对 IPA 进行签名并安装的方式，例如 [iLoader](https://github.com/nab138/iloader)
 - 设备已开启开发者模式
 - Bundle identifier：`me.ssus.gestaltedit`
 
 GestaltEdit 在访问 MobileGestalt 前会检查当前系统版本号。当前版本接受 iOS 与 iPadOS 27 beta 1–4（24A5355q、24A5370h、24A5380h、24A5390f），以及 iPadOS beta 3 的修订版本 24A5380i。Apple 随时可能改变这些私有行为。
 
-## 编译
+## 使用 iLoader 签名安装
 
-在 Xcode 中打开 `GestaltEdit.xcodeproj`，为目标选择你自己的开发团队，然后编译。也可以使用命令行：
+GestaltEdit 在 [Releases](https://github.com/frs0n/GestaltEdit/releases/latest) 页面提供可直接安装的 IPA。[iLoader](https://github.com/nab138/iloader) 可以用你自己的 Apple ID 对它进行签名并安装。
 
-```sh
-xcodebuild \
-  -project GestaltEdit.xcodeproj \
-  -scheme GestaltEdit \
-  -configuration Release \
-  -destination 'generic/platform=iOS' \
-  DEVELOPMENT_TEAM=YOUR_TEAM_ID \
-  build
-```
-
-若只想在不签名的情况下验证源码：
-
-```sh
-xcodebuild \
-  -project GestaltEdit.xcodeproj \
-  -scheme GestaltEdit \
-  -sdk iphoneos \
-  -destination 'generic/platform=iOS' \
-  CODE_SIGNING_ALLOWED=NO \
-  CODE_SIGNING_REQUIRED=NO \
-  build
-```
-
-IPA 文件、证书、描述文件、开发团队标识以及本地 Xcode 用户数据均已被有意排除在仓库之外。
+1. 从 [Releases](https://github.com/frs0n/GestaltEdit/releases/latest) 下载最新的 `GestaltEdit.ipa`。
+2. 从 [iloader.app](https://iloader.app/) 或其 [GitHub Releases](https://github.com/nab138/iloader/releases) 安装 iLoader（支持 Windows、Linux 与 macOS）。
+3. 用数据线把 iPhone 或 iPad 连接到电脑，打开 iLoader 并登录你的 Apple ID（仅用于本地签名）。
+4. 在 iLoader 中导入刚下载的 IPA，让它完成签名并安装到设备。
+5. 若设备提示信任开发者证书，请前往「设置」→「通用」→「VPN 与设备管理」进行信任。
 
 ## 使用方法
 

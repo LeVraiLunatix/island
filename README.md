@@ -7,6 +7,7 @@
 **A MobileGestalt utility that runs directly on iPhone and iPad**
 
 <a href="https://trendshift.io/repositories/128548?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-128548" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/128548/daily?language=Swift" alt="frs0n%2FGestaltEdit | Trendshift" width="250" height="55"/></a>
+<a href="https://trendshift.io/repositories/128548?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-128548" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/128548/weekly?language=Swift" alt="frs0n%2FGestaltEdit | Trendshift" width="250" height="55"/></a>
 
 <p>
   <a href="https://github.com/frs0n/GestaltEdit/releases/latest"><img src="https://img.shields.io/github/v/release/frs0n/GestaltEdit?style=flat-square&label=release&color=6E56CF" alt="Latest release"></a>
@@ -18,7 +19,7 @@
 
 <a href="https://github.com/frs0n/GestaltEdit/releases/latest"><b>Download IPA</b></a> ·
 <a href="#requirements-and-signing">Requirements</a> ·
-<a href="#building">Building</a> ·
+<a href="#installing-with-iloader">Installing</a> ·
 <a href="#usage">Usage</a> ·
 <a href="README.zh-CN.md">简体中文</a>
 
@@ -28,6 +29,9 @@ GestaltEdit is a MobileGestalt utility that runs directly on iPhone and iPad —
 
 > [!WARNING]
 > This project uses private APIs and modifies system cache data. Incorrect MobileGestalt values can break system features or UI behavior and may require restoring the device. Use it only on devices you own or are authorized to manage.
+
+> [!IMPORTANT]
+> GestaltEdit is completely free and open source. Selling this app or any repackaged/modified version of it, in any form, is strictly prohibited. If you find someone selling it, please report them.
 
 ## Features
 
@@ -64,40 +68,21 @@ Importing only copies a file into GestaltEdit's backup library; it does not imme
 ## Requirements and signing
 
 - Supported system versions: iOS and iPadOS 27 beta 1 through beta 4 only
-- Xcode and a signing method that can install apps on the target device
+- A way to sign and install the IPA, such as [iLoader](https://github.com/nab138/iloader)
 - Developer Mode enabled on the device
 - Bundle identifier: `me.ssus.gestaltedit`
 
 GestaltEdit checks the running system build before accessing MobileGestalt. The current release accepts iOS and iPadOS 27 beta 1–4 (24A5355q, 24A5370h, 24A5380h, and 24A5390f), plus the revised iPadOS beta 3 build 24A5380i. Apple may change these private behaviors at any time.
 
-## Building
+## Installing with iLoader
 
-Open `GestaltEdit.xcodeproj` in Xcode, select your own development team for the target, and build. You can also build from the command line:
+GestaltEdit ships as a ready-to-install IPA on the [Releases](https://github.com/frs0n/GestaltEdit/releases/latest) page. [iLoader](https://github.com/nab138/iloader) can sign and install it directly using your own Apple ID.
 
-```sh
-xcodebuild \
-  -project GestaltEdit.xcodeproj \
-  -scheme GestaltEdit \
-  -configuration Release \
-  -destination 'generic/platform=iOS' \
-  DEVELOPMENT_TEAM=YOUR_TEAM_ID \
-  build
-```
-
-To validate the source without signing:
-
-```sh
-xcodebuild \
-  -project GestaltEdit.xcodeproj \
-  -scheme GestaltEdit \
-  -sdk iphoneos \
-  -destination 'generic/platform=iOS' \
-  CODE_SIGNING_ALLOWED=NO \
-  CODE_SIGNING_REQUIRED=NO \
-  build
-```
-
-IPA files, certificates, provisioning profiles, development team identifiers, and local Xcode user data are intentionally excluded from the repository.
+1. Download the latest `GestaltEdit.ipa` from [Releases](https://github.com/frs0n/GestaltEdit/releases/latest).
+2. Install iLoader from [iloader.app](https://iloader.app/) or its [GitHub releases](https://github.com/nab138/iloader/releases) (Windows, Linux, and macOS are supported).
+3. Connect your iPhone or iPad to your computer with a cable, then open iLoader and sign in with your Apple ID (used only for local code signing).
+4. Import the downloaded IPA into iLoader and let it sign and install the app to your device.
+5. On the device, trust the developer certificate under Settings → General → VPN & Device Management if prompted.
 
 ## Usage
 
