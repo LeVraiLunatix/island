@@ -75,15 +75,20 @@ private struct TweakWorkbench: View {
 
                 Section(String(localized: "Developer")) {
                     DeveloperFooter()
-                        .listRowInsets(EdgeInsets(top: 18, leading: 16, bottom: 18, trailing: 16))
+
+                    PlacardPromotionLink()
 
                     Link(destination: URL(string: "https://afdian.com/a/frs0n")!) {
-                        Label {
-                            Text("支持开发者")
-                        } icon: {
+                        HStack(spacing: 12) {
                             Image(systemName: "heart.fill")
                                 .foregroundStyle(.pink)
+                                .frame(width: 40, height: 40)
+
+                            Text("支持开发者")
+
+                            Spacer()
                         }
+                        .frame(minHeight: 40)
                     }
                 }
             }
@@ -212,16 +217,53 @@ private struct TweakWorkbench: View {
     }
 }
 
+private struct PlacardPromotionLink: View {
+    private let placardURL = URL(string: "https://github.com/frs0n/placard")!
+
+    var body: some View {
+        Link(destination: placardURL) {
+            HStack(spacing: 12) {
+                placardIcon
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 40, height: 40)
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Placard")
+                        .font(.body.weight(.medium))
+                    Text("iPhone 动态壁纸")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+            }
+            .frame(minHeight: 40)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Placard，iPhone 动态壁纸，点击打开 GitHub")
+    }
+
+    private var placardIcon: Image {
+        guard let url = Bundle.main.url(forResource: "PlacardIcon", withExtension: "png"),
+              let image = UIImage(contentsOfFile: url.path) else {
+            return Image(systemName: "rectangle.portrait.on.rectangle.portrait.angled")
+        }
+        return Image(uiImage: image)
+    }
+}
+
 private struct DeveloperFooter: View {
     private let douyinURL = URL(string: "https://v.douyin.com/hHHMAlF5bE0/")!
 
     var body: some View {
         Link(destination: douyinURL) {
-            HStack(spacing: 10) {
+            HStack(spacing: 12) {
                 avatarImage
                     .resizable()
                     .scaledToFill()
-                    .frame(width: 34, height: 34)
+                    .frame(width: 40, height: 40)
                     .clipShape(Circle())
 
                 Text("SUSS")
@@ -229,6 +271,7 @@ private struct DeveloperFooter: View {
 
                 Spacer()
             }
+            .frame(minHeight: 40)
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("开发者 SUSS，点击打开抖音")
