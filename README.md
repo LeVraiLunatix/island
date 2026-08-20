@@ -18,89 +18,47 @@
 </p>
 
 <a href="https://github.com/frs0n/GestaltEdit/releases/latest"><b>Download IPA</b></a> ·
-<a href="#requirements-and-signing">Requirements</a> ·
-<a href="#installing-with-iloader">Installing</a> ·
-<a href="#usage">Usage</a> ·
+<a href="#requirements">Requirements</a> ·
+<a href="#install">Install</a> ·
 <a href="README.zh-CN.md">简体中文</a>
 
 </div>
 
-GestaltEdit is a MobileGestalt utility that runs directly on iPhone and iPad — no computer, no sideload host, no tethering. It reads the device's `com.apple.MobileGestalt.plist` and provides common capability presets, a complete field editor, and backup/import/restore workflows.
+Edit `com.apple.MobileGestalt.plist` on-device. Capability presets, a full field editor, and backup/restore.
 
 > [!WARNING]
-> This project uses private APIs and modifies system cache data. Incorrect MobileGestalt values can break system features or UI behavior and may require restoring the device. Use it only on devices you own or are authorized to manage.
+> This app uses private APIs and modifies system cache data. Bad MobileGestalt values can break system features and may require restoring the device. Use only on devices you own.
 
 > [!IMPORTANT]
-> GestaltEdit is completely free and open source. Selling this app or any repackaged/modified version of it, in any form, is strictly prohibited. If you find someone selling it, please report them.
+> GestaltEdit is free and open source. Selling it, repackaged or modified, is strictly prohibited.
 
 ## Features
 
-### MobileGestalt presets
+**Presets** — Dynamic Island, device model name, boot chime, charge limit, tap to wake, Camera Control, Apple Pencil, Action Button, Collision SOS, Always-On Display, wallpaper parallax, Stage Manager, iPad app compatibility, Siri AI US region, and more. Tick what you want, tap Apply.
 
-- Dynamic Island device subtypes and the alternate support flag
-- Device model name shown in About
-- Boot/shutdown chime, charge limit, tap to wake, and Camera Control settings
-- Apple Pencil, Action Button, and Collision SOS settings
-- Always-On Display, AOD vibrancy, wallpaper parallax, and Liquid Glass low-performance mode
-- Stage Manager, iPad app compatibility, and Nugget's iPadOS `CacheData` patch
-- Siri AI US region, Apple internal install, internal storage, and Security Research Device mode
+**Field editor** — Search and edit any MobileGestalt key by hand when a preset doesn't cover it.
 
-Presets follow Nugget's staged-apply model: toggles represent changes for the next write, and all selected changes are committed with the bottom Apply button. Selections are cleared after a successful write. Options that write conflicting values are mutually exclusive.
+**Backups** — Every write is backed up automatically. Back up, import, export, and restore at any time.
 
-### Field editor
+## Requirements
 
-- Search keys and values in `CacheExtra` and at the plist top level
-- Edit String, Integer, Float, Boolean, Data, Array, and Dictionary values
-- Add or remove `CacheExtra` fields
-- Read the file back after saving to verify the write
-- Automatically respring after a verified write so changes take effect without a manual restart
+- iOS / iPadOS 27 beta 1–4
+- Developer Mode enabled
+- A signing tool such as [iLoader](https://github.com/nab138/iloader)
 
-### Backups
+## Install
 
-- Manually back up the current MobileGestalt file
-- Automatically preserve the original plist before every write
-- Import `.plist` files through the system file picker
-- Validate the top-level dictionary and `CacheExtra` before importing
-- Export, restore, and delete local backups
-
-Importing only copies a file into GestaltEdit's backup library; it does not immediately modify the system file. Restoring first backs up the current file and then writes the selected backup.
-
-## Requirements and signing
-
-- Supported system versions: iOS and iPadOS 27 beta 1 through beta 4 only
-- A way to sign and install the IPA, such as [iLoader](https://github.com/nab138/iloader)
-- Developer Mode enabled on the device
-- Bundle identifier: `me.ssus.gestaltedit`
-
-GestaltEdit checks the running system build before accessing MobileGestalt. The current release accepts iOS and iPadOS 27 beta 1–4 (24A5355q, 24A5370h, 24A5380h, and 24A5390f), plus the revised iPadOS beta 3 build 24A5380i. Apple may change these private behaviors at any time.
-
-## Installing with iLoader
-
-GestaltEdit ships as a ready-to-install IPA on the [Releases](https://github.com/frs0n/GestaltEdit/releases/latest) page. [iLoader](https://github.com/nab138/iloader) can sign and install it directly using your own Apple ID.
-
-1. Download the latest `GestaltEdit.ipa` from [Releases](https://github.com/frs0n/GestaltEdit/releases/latest).
-2. Install iLoader from [iloader.app](https://iloader.app/) or its [GitHub releases](https://github.com/nab138/iloader/releases) (Windows, Linux, and macOS are supported).
-3. Connect your iPhone or iPad to your computer with a cable, then open iLoader and sign in with your Apple ID (used only for local code signing).
-4. Import the downloaded IPA into iLoader and let it sign and install the app to your device.
-5. On the device, trust the developer certificate under Settings → General → VPN & Device Management if prompted.
-
-## Usage
-
-1. Install and open GestaltEdit, then wait for it to read MobileGestalt.
-2. Select the desired changes on the Tools tab and tap Apply.
-3. Use the Fields tab when you need precise plist editing.
-4. Create, import, export, or restore backups from the Backups tab.
-5. After a successful write or restore, GestaltEdit automatically refreshes SpringBoard so the changes take effect.
+1. Download `GestaltEdit.ipa` from [Releases](https://github.com/frs0n/GestaltEdit/releases/latest).
+2. Install [iLoader](https://iloader.app/), connect your device, and sign in with your Apple ID (used only for local signing).
+3. Import the IPA to sign and install it, then trust the certificate under Settings → General → VPN & Device Management.
 
 ## Credits
 
-- [Nugget](https://github.com/leminlimez/Nugget) — MobileGestalt presets and the iPadOS `CacheData` approach
-- [FilzaSlop](https://github.com/0xjohnnydev/FilzaSlop) — ContainerManager file-access research
-- [bad_query](https://github.com/forcequitOS/bad_query) — path-based ContainerManager sandbox escape
-- [0xJohnny](https://x.com/0xjohnny) — MobileHouseArrest / ContainerManager proof of concept
-- [neospring](https://github.com/rooootdev/neospring) — WebKit respring implementation
+- [Nugget](https://github.com/leminlimez/Nugget) — presets and iPadOS support
+- [FilzaSlop](https://github.com/0xjohnnydev/FilzaSlop), [bad_query](https://github.com/forcequitOS/bad_query), [0xJohnny](https://x.com/0xjohnny) — file access research
+- [neospring](https://github.com/rooootdev/neospring) — respring implementation
 
-GestaltEdit is an independent implementation and is not affiliated with Apple or the projects listed above.
+Not affiliated with Apple or the projects above.
 
 ## License
 
