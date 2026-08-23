@@ -1,60 +1,55 @@
 <div align="center">
 
-<img src="docs/icon.png" alt="GestaltEdit app icon" width="128" height="128">
+<img src="docs/icon.png" alt="Island app icon" width="128" height="128">
 
-# GestaltEdit
+# Island
 
-**A MobileGestalt utility that runs directly on iPhone and iPad**
-
-<a href="https://trendshift.io/repositories/128548?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-128548" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/128548/daily?language=Swift" alt="frs0n%2FGestaltEdit | Trendshift" width="250" height="55"/></a>
-<a href="https://trendshift.io/repositories/128548?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-128548" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/128548/weekly?language=Swift" alt="frs0n%2FGestaltEdit | Trendshift" width="250" height="55"/></a>
+**Force-enable the Dynamic Island on unsupported iPhones, on-device**
 
 <p>
-  <a href="https://github.com/frs0n/GestaltEdit/releases/latest"><img src="https://img.shields.io/github/v/release/frs0n/GestaltEdit?style=flat-square&label=release&color=6E56CF" alt="Latest release"></a>
-  <a href="https://github.com/frs0n/GestaltEdit/releases"><img src="https://img.shields.io/github/downloads/frs0n/GestaltEdit/total?style=flat-square&label=downloads&color=6E56CF" alt="Downloads"></a>
-  <a href="https://github.com/frs0n/GestaltEdit/stargazers"><img src="https://img.shields.io/github/stars/frs0n/GestaltEdit?style=flat-square&color=6E56CF" alt="Stars"></a>
-  <img src="https://img.shields.io/badge/iOS%20%7C%20iPadOS-27-000000?style=flat-square&logo=apple&logoColor=white" alt="Platform">
+  <a href="https://github.com/LeVraiLunatix/island/releases/latest"><img src="https://img.shields.io/github/v/release/LeVraiLunatix/island?style=flat-square&label=release&color=6E56CF" alt="Latest release"></a>
+  <a href="https://github.com/LeVraiLunatix/island/releases"><img src="https://img.shields.io/github/downloads/LeVraiLunatix/island/total?style=flat-square&label=downloads&color=6E56CF" alt="Downloads"></a>
+  <img src="https://img.shields.io/badge/iOS%20%7C%20iPadOS-27%20beta%201--4-000000?style=flat-square&logo=apple&logoColor=white" alt="Platform">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Noncommercial-6E56CF?style=flat-square" alt="PolyForm Noncommercial License"></a>
 </p>
 
-<a href="https://github.com/frs0n/GestaltEdit/releases/latest"><b>Download IPA</b></a> ·
+<a href="https://github.com/LeVraiLunatix/island/releases/latest"><b>Download IPA</b></a> ·
 <a href="#requirements">Requirements</a> ·
 <a href="#install">Install</a> ·
 <a href="README.zh-CN.md">简体中文</a>
 
 </div>
 
-Edit `com.apple.MobileGestalt.plist` on-device. Capability presets, a full field editor, and backup/restore.
+Island writes a Dynamic Island `ArtworkDeviceSubType` into `com.apple.MobileGestalt.plist` using the `bad_query` sandbox-extension exploit, then respring's SpringBoard. Pick a subtype, tap Activer.
 
 > [!WARNING]
-> This app uses private APIs and modifies system cache data. Bad MobileGestalt values can break system features and may require restoring the device. Use only on devices you own.
+> This app uses a private-API sandbox escape and modifies system cache data. It only works on the exact iOS/iPadOS 27 beta builds it targets, and writing bad values can break system features or require restoring the device. Use only on devices you own.
 
 > [!IMPORTANT]
-> GestaltEdit is free and its source is public. Without authorization, you may not sell it.
+> Island is free and its source is public. Without authorization, you may not sell it.
 
-## Features
+## What it does
 
-**Presets** — Dynamic Island, device model name, boot chime, charge limit, tap to wake, Camera Control, Apple Pencil, Action Button, Collision SOS, Always-On Display, wallpaper parallax, Stage Manager, iPad app compatibility, Siri AI US region, and more. Tick what you want, tap Apply.
+A single toggle: pick a Dynamic Island subtype (iPhone 14 Pro, 14 Pro Max, 16 Pro, 16 Pro Max, or iPhone Air) and apply it. Island backs up the original plist before every write, then respring's automatically.
 
-**Field editor** — Search and edit any MobileGestalt key by hand when a preset doesn't cover it.
-
-**Backups** — Every write is backed up automatically. Back up, import, export, and restore at any time.
+This is a stripped-down fork of [GestaltEdit](https://github.com/frs0n/GestaltEdit), keeping only the Dynamic Island path — no field editor, no other capability presets, no backup library UI.
 
 ## Requirements
 
-- iOS / iPadOS 27 beta 1–4
+- iOS / iPadOS 27 beta 1–4 only (the `bad_query` path traversal this app relies on was patched after beta 4)
 - Developer Mode enabled
 - A signing tool such as [iLoader](https://github.com/nab138/iloader)
 
 ## Install
 
-1. Download `GestaltEdit.ipa` from [Releases](https://github.com/frs0n/GestaltEdit/releases/latest).
+1. Download `Island.ipa` from [Releases](https://github.com/LeVraiLunatix/island/releases/latest).
 2. Install [iLoader](https://iloader.app/), connect your device, and sign in with your Apple ID (used only for local signing).
 3. Import the IPA to sign and install it, then trust the certificate under Settings → General → VPN & Device Management.
 
 ## Credits
 
-- [Nugget](https://github.com/leminlimez/Nugget) — presets and iPadOS support
+- [frs0n/GestaltEdit](https://github.com/frs0n/GestaltEdit) — the app this project is forked from
+- [Nugget](https://github.com/leminlimez/Nugget) — the alternate Dynamic Island enable method
 - [FilzaSlop](https://github.com/0xjohnnydev/FilzaSlop), [bad_query](https://github.com/forcequitOS/bad_query), [0xJohnny](https://x.com/0xjohnny) — file access research
 - [neospring](https://github.com/rooootdev/neospring) — respring implementation
 
