@@ -91,6 +91,32 @@ final class PosterBoardInstaller: ObservableObject {
         return PosterBoardInstallResult(copiedItemNames: copiedNames, destinationPaths: destinationPaths)
     }
 
+    /// Installs a descriptor bundle built on-device (see
+    /// CustomWallpaperBuilder) rather than downloaded as a .tendies.
+    /// `descriptorsFolder` must be a "descriptors" directory directly
+    /// containing one descriptor-UUID folder, the same shape a flat
+    /// .tendies unzips to.
+    @discardableResult
+    func installCustomDescriptors(at descriptorsFolder: URL) async throws -> PosterBoardInstallResult {
+        let appHash = PosterBoardHashStore.hash.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !appHash.isEmpty else { throw PosterBoardError.missingAppHash }
+
+        isInstalling = true
+        defer {
+            isInstalling = false
+            progressMessage = nil
+        }
+
+        progressMessage = "Installation dans PosterBoard…"
+        let (names, destination) = try Self.install(
+            descriptorDir: descriptorsFolder,
+            extensionID: "com.apple.WallpaperKit.CollectionsPoster",
+            appHash: appHash
+        )
+        guard !names.isEmpty else { throw PosterBoardError.nothingCopied }
+        return PosterBoardInstallResult(copiedItemNames: names, destinationPaths: [destination])
+    }
+
     // MARK: - Unzip
 
     private static func unzip(_ data: Data) throws -> URL {

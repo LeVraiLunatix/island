@@ -5,6 +5,7 @@ struct WallpapersView: View {
     @StateObject private var loader = WallpaperCatalogLoader()
     @State private var category: WallpaperCategory = .custom
     @State private var selectedWallpaper: Wallpaper?
+    @State private var showsCreateWallpaper = false
 
     private let columns = [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)]
 
@@ -27,9 +28,21 @@ struct WallpapersView: View {
         .background(Color.black)
         .navigationTitle("Fonds d'écran")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    showsCreateWallpaper = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+        }
         .task(id: category) { await loader.load(category) }
         .sheet(item: $selectedWallpaper) { wallpaper in
             WallpaperDetailSheet(wallpaper: wallpaper)
+        }
+        .sheet(isPresented: $showsCreateWallpaper) {
+            CreateWallpaperView()
         }
     }
 
