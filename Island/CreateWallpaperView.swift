@@ -9,6 +9,7 @@ struct CreateWallpaperView: View {
     @State private var photosPickerItem: PhotosPickerItem?
     @State private var pickedImage: UIImage?
     @State private var wallpaperName = "Mon fond d'écran"
+    @State private var isAnimated = true
 
     @State private var isBuilding = false
     @State private var buildError: String?
@@ -102,9 +103,15 @@ struct CreateWallpaperView: View {
                 .padding(12)
                 .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
 
-            Text("La photo est recadrée en plein écran (390×844 pt) et posée telle quelle, sans les couches animées des fonds d'écran de la bibliothèque Cowabunga.")
+            Text("La photo est recadrée en plein écran (390×844 pt), sans les couches décoratives des fonds d'écran de la bibliothèque Cowabunga.")
                 .font(.caption)
                 .foregroundStyle(.white.opacity(0.6))
+
+            Toggle(isOn: $isAnimated) {
+                Text("Animation douce (zoom/pan en boucle)")
+                    .foregroundStyle(.white)
+            }
+            .tint(.white)
 
             Button {
                 installDirectly()
@@ -195,7 +202,7 @@ struct CreateWallpaperView: View {
         isBuilding = true
         Task {
             do {
-                let descriptorsFolder = try CustomWallpaperBuilder.buildDescriptorsFolder(from: pickedImage)
+                let descriptorsFolder = try CustomWallpaperBuilder.buildDescriptorsFolder(from: pickedImage, animated: isAnimated)
                 defer { try? FileManager.default.removeItem(at: descriptorsFolder.deletingLastPathComponent()) }
                 isBuilding = false
                 let result = try await installer.installCustomDescriptors(at: descriptorsFolder)
@@ -215,7 +222,7 @@ struct CreateWallpaperView: View {
         isBuilding = true
         Task {
             do {
-                let descriptorsFolder = try CustomWallpaperBuilder.buildDescriptorsFolder(from: pickedImage)
+                let descriptorsFolder = try CustomWallpaperBuilder.buildDescriptorsFolder(from: pickedImage, animated: isAnimated)
                 let tendiesURL = try CustomWallpaperBuilder.exportTendies(descriptorsFolder: descriptorsFolder, name: wallpaperName)
                 try? FileManager.default.removeItem(at: descriptorsFolder.deletingLastPathComponent())
                 exportedTendiesURL = tendiesURL

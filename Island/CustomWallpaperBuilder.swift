@@ -25,7 +25,7 @@ enum CustomWallpaperBuilder {
     /// PosterBoardInstaller expects to copy from, matching how a real
     /// .tendies unzips (a top-level "descriptors" folder directly
     /// containing one descriptor-UUID folder per wallpaper).
-    static func buildDescriptorsFolder(from image: UIImage) throws -> URL {
+    static func buildDescriptorsFolder(from image: UIImage, animated: Bool) throws -> URL {
         guard let jpegData = croppedJPEGData(from: image) else {
             throw CustomWallpaperBuilderError.imageEncodingFailed
         }
@@ -67,7 +67,10 @@ enum CustomWallpaperBuilder {
             try fm.createDirectory(at: assetsDir, withIntermediateDirectories: true)
             try write(CustomWallpaperTemplate.assetManifest, to: backgroundDir.appendingPathComponent("assetManifest.caml"))
             try write(CustomWallpaperTemplate.indexXML, to: backgroundDir.appendingPathComponent("index.xml"))
-            try write(CustomWallpaperTemplate.imageLayerCAML(imageFileName: "photo.jpg"), to: backgroundDir.appendingPathComponent("main.caml"))
+            try write(
+                CustomWallpaperTemplate.imageLayerCAML(imageFileName: "photo.jpg", animated: animated),
+                to: backgroundDir.appendingPathComponent("main.caml")
+            )
             try jpegData.write(to: assetsDir.appendingPathComponent("photo.jpg"), options: .atomic)
 
             for caName in [CustomWallpaperTemplate.floatingCAName, CustomWallpaperTemplate.foregroundCAName] {

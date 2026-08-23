@@ -96,11 +96,56 @@ enum CustomWallpaperTemplate {
 </caml>
 """
 
+    /// The subtle "breathing" Ken Burns loop: a slow eased zoom
+    /// (transform.scale) combined with a slight drift (position.x/y),
+    /// autoreversing forever. Built from the exact CAKeyframeAnimation
+    /// shape verified in a real sample (a rotating "spacecraft" layer in
+    /// Apollo15) -- same attributes, same duration/speed split, same
+    /// <values><real .../></values> encoding. Uses separate position.x and
+    /// position.y scalar key paths rather than a single "position" key path
+    /// since only the scalar <real> value encoding was ever confirmed
+    /// working; a compound CGPoint keyframe format was never observed.
+    /// Scale only ever grows from 1.0 (never shrinks below it), so the
+    /// oversized photo always keeps covering the canvas with no gaps.
+    private static let breathingAnimations = """
+    <animations>
+      <animation type="CAKeyframeAnimation" keyPath="transform.scale" autoreverses="1" beginTime="1e-100" duration="1" speed="0.0625" removedOnCompletion="0" repeatCount="inf" repeatDuration="inf" calculationMode="linear">
+        <values>
+          <real value="1.0"/>
+          <real value="1.015"/>
+          <real value="1.045"/>
+          <real value="1.07"/>
+          <real value="1.08"/>
+        </values>
+      </animation>
+      <animation type="CAKeyframeAnimation" keyPath="position.x" autoreverses="1" beginTime="1e-100" duration="1" speed="0.0625" removedOnCompletion="0" repeatCount="inf" repeatDuration="inf" calculationMode="linear">
+        <values>
+          <real value="195"/>
+          <real value="195.6"/>
+          <real value="196.8"/>
+          <real value="197.7"/>
+          <real value="198"/>
+        </values>
+      </animation>
+      <animation type="CAKeyframeAnimation" keyPath="position.y" autoreverses="1" beginTime="1e-100" duration="1" speed="0.0625" removedOnCompletion="0" repeatCount="inf" repeatDuration="inf" calculationMode="linear">
+        <values>
+          <real value="422"/>
+          <real value="421.4"/>
+          <real value="420.2"/>
+          <real value="419.3"/>
+          <real value="419"/>
+        </values>
+      </animation>
+    </animations>
+    """
+
     /// The verified "empty Background" Root Layer wrapper with one
     /// full-bleed CGImage sublayer grafted in, sized to exactly match the
-    /// canvas so the pre-cropped photo fills it with no distortion.
-    static func imageLayerCAML(imageFileName: String) -> String {
-        """
+    /// canvas so the pre-cropped photo fills it with no distortion. When
+    /// `animated` is true, adds the gentle zoom/pan loop above.
+    static func imageLayerCAML(imageFileName: String, animated: Bool) -> String {
+        let animationsBlock = animated ? "\n        \(breathingAnimations)" : ""
+        return """
 <?xml version="1.0" encoding="UTF-8"?>
 <caml xmlns="http://www.apple.com/CoreAnimation/1.0">
   <CALayer id="1761670838602" name="Root Layer" bounds="0 0 390 844" position="195 422" geometryFlipped="0" backgroundColor="0.898 0.9059 0.9216" allowsEdgeAntialiasing="1" allowsGroupOpacity="1" contentsFormat="RGBA8" cornerCurve="circular">
@@ -109,7 +154,7 @@ enum CustomWallpaperTemplate {
       <CALayer id="2xfesgvaphemhatcj75" name="photo" bounds="0 0 390 844" position="195 422" geometryFlipped="0" masksToBounds="1" opacity="1" transform.rotation.z="0" transform.rotation.x="0" transform.rotation.y="0" transform="rotate(0deg) rotate(0deg, 0, 1, 0) rotate(0deg, 1, 0, 0)" allowsEdgeAntialiasing="1" allowsGroupOpacity="1" contentsFormat="RGBA8" cornerCurve="circular">
         <contents>
           <CGImage src="assets/\(imageFileName)"/>
-        </contents>
+        </contents>\(animationsBlock)
       </CALayer>
     </sublayers>
     <states>
