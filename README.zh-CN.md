@@ -36,6 +36,8 @@ Island 通过 `bad_query` 沙盒扩展漏洞，直接在设备上编辑 `com.app
 
 **功能预设** —— 开关机铃声、充电限制、轻点唤醒、相机控制、Apple Pencil、操作按钮、车祸检测、息屏显示、壁纸视差、台前调度、iPad 应用兼容性、iPadOS 模式，以及内部/研究相关开关。勾选需要的，点「Activer」。
 
+**壁纸库** —— 在应用内浏览 [Cowabunga](https://cowabun.ga/wallpapers) 的 `.tendies` 壁纸目录，选中后交给 [Pocket Poster](https://cowabun.ga) 完成安装。Island 只负责拉取目录并打开 `pocketposter://` 链接，本身不写入壁纸数据。
+
 每次写入前都会自动备份原始 plist，写入后自动注销。
 
 本项目是 [GestaltEdit](https://github.com/frs0n/GestaltEdit) 的分支，改用深色极简界面——保留完整的功能预设，但去掉了手动字段编辑器和备份库界面。
@@ -58,6 +60,7 @@ Island 通过 `bad_query` 沙盒扩展漏洞，直接在设备上编辑 `com.app
 - [Nugget](https://github.com/leminlimez/Nugget) —— 灵动岛的替代开启方式
 - [FilzaSlop](https://github.com/0xjohnnydev/FilzaSlop)、[bad_query](https://github.com/forcequitOS/bad_query)、[0xJohnny](https://x.com/0xjohnny) —— 文件访问研究
 - [neospring](https://github.com/rooootdev/neospring) —— 注销实现
+- [Cowabunga](https://cowabun.ga) 与 [nugget-wallpapers](https://github.com/SerStars/nugget-wallpapers) 目录 —— 壁纸库与 Pocket Poster 安装交接
 
 与 Apple 及上述项目均无隶属关系。
 

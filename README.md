@@ -36,6 +36,8 @@ Island edits `com.apple.MobileGestalt.plist` on-device using the `bad_query` san
 
 **Capability presets** — boot chime, charge limit, tap to wake, Camera Control, Apple Pencil, Action Button, Collision SOS, Always-On Display, wallpaper parallax, Stage Manager, iPad app compatibility, iPadOS mode, and internal/research flags. Tick what you want, tap Activer.
 
+**Wallpaper library** — browse the [Cowabunga](https://cowabun.ga/wallpapers) `.tendies` wallpaper catalog in-app and hand a pick off to [Pocket Poster](https://cowabun.ga) for installation. Island only fetches the catalog and opens the `pocketposter://` URL scheme — it does not write wallpaper data itself.
+
 Island backs up the original plist before every write, then respring's automatically.
 
 This is a fork of [GestaltEdit](https://github.com/frs0n/GestaltEdit) restyled around a dark, minimal UI — it keeps the full tweak catalog but drops the manual field editor and backup-library screens.
@@ -58,6 +60,7 @@ This is a fork of [GestaltEdit](https://github.com/frs0n/GestaltEdit) restyled a
 - [Nugget](https://github.com/leminlimez/Nugget) — the alternate Dynamic Island enable method
 - [FilzaSlop](https://github.com/0xjohnnydev/FilzaSlop), [bad_query](https://github.com/forcequitOS/bad_query), [0xJohnny](https://x.com/0xjohnny) — file access research
 - [neospring](https://github.com/rooootdev/neospring) — respring implementation
+- [Cowabunga](https://cowabun.ga) and the [nugget-wallpapers](https://github.com/SerStars/nugget-wallpapers) catalog — wallpaper library and Pocket Poster install handoff
 
 Not affiliated with Apple or the projects above.
 

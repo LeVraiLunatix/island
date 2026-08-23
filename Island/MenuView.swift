@@ -5,6 +5,7 @@ private enum MenuDestination: Hashable {
     case appleIntelligence
     case deviceName
     case category(GestaltTweakCategory)
+    case wallpapers
 }
 
 private struct MenuCard: Identifiable {
@@ -12,6 +13,7 @@ private struct MenuCard: Identifiable {
     let subtitle: String
     let systemImage: String
     let destination: MenuDestination
+    var requiresConnection = true
 
     var id: String { title }
 }
@@ -23,6 +25,7 @@ struct MenuView: View {
         MenuCard(title: "Dynamic Island", subtitle: "Choisir un modèle", systemImage: "capsule.fill", destination: .dynamicIsland),
         MenuCard(title: "Apple Intelligence", subtitle: "Forcer la région US", systemImage: "sparkles", destination: .appleIntelligence),
         MenuCard(title: "Nom de l'appareil", subtitle: "Modifier le modèle affiché", systemImage: "textformat", destination: .deviceName),
+        MenuCard(title: "Fonds d'écran", subtitle: "Bibliothèque Cowabunga", systemImage: "photo.stack.fill", destination: .wallpapers, requiresConnection: false),
         MenuCard(title: "Affichage", subtitle: "AOD, parallaxe, Liquid Glass", systemImage: "sun.max.fill", destination: .category(.display)),
         MenuCard(title: "Matériel", subtitle: "Camera Control, Pencil…", systemImage: "cpu", destination: .category(.hardware)),
         MenuCard(title: "iPad", subtitle: "Stage Manager, apps iPad", systemImage: "ipad", destination: .category(.ipad)),
@@ -44,7 +47,7 @@ struct MenuView: View {
                                     MenuCardView(card: card)
                                 }
                                 .buttonStyle(.plain)
-                                .disabled(viewModel.plist == nil)
+                                .disabled(card.requiresConnection && viewModel.plist == nil)
                             }
                         }
                     }
@@ -66,6 +69,8 @@ struct MenuView: View {
                     DeviceNameDetailView()
                 case .category(let category):
                     CategoryDetailView(category: category)
+                case .wallpapers:
+                    WallpapersView()
                 }
             }
             .safeAreaInset(edge: .bottom) {
