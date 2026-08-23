@@ -4,7 +4,7 @@
 
 # Island
 
-**Force-enable the Dynamic Island on unsupported iPhones, on-device**
+**A MobileGestalt utility focused on Dynamic Island and Apple Intelligence, on-device**
 
 <p>
   <a href="https://github.com/LeVraiLunatix/island/releases/latest"><img src="https://img.shields.io/github/v/release/LeVraiLunatix/island?style=flat-square&label=release&color=6E56CF" alt="Latest release"></a>
@@ -20,7 +20,7 @@
 
 </div>
 
-Island writes a Dynamic Island `ArtworkDeviceSubType` into `com.apple.MobileGestalt.plist` using the `bad_query` sandbox-extension exploit, then respring's SpringBoard. Pick a subtype, tap Activer.
+Island edits `com.apple.MobileGestalt.plist` on-device using the `bad_query` sandbox-extension exploit, then respring's SpringBoard. Pick what you want, tap Activer.
 
 > [!WARNING]
 > This app uses a private-API sandbox escape and modifies system cache data. It only works on the exact iOS/iPadOS 27 beta builds it targets, and writing bad values can break system features or require restoring the device. Use only on devices you own.
@@ -30,9 +30,15 @@ Island writes a Dynamic Island `ArtworkDeviceSubType` into `com.apple.MobileGest
 
 ## What it does
 
-A single toggle: pick a Dynamic Island subtype (iPhone 14 Pro, 14 Pro Max, 16 Pro, 16 Pro Max, or iPhone Air) and apply it. Island backs up the original plist before every write, then respring's automatically.
+**Dynamic Island** — pick a subtype (iPhone 14 Pro, 14 Pro Max, 16 Pro, 16 Pro Max, or iPhone Air) and apply it.
 
-This is a stripped-down fork of [GestaltEdit](https://github.com/frs0n/GestaltEdit), keeping only the Dynamic Island path — no field editor, no other capability presets, no backup library UI.
+**Apple Intelligence** — force-enable the US region on unsupported hardware, with device identity spoofing when required.
+
+**Capability presets** — boot chime, charge limit, tap to wake, Camera Control, Apple Pencil, Action Button, Collision SOS, Always-On Display, wallpaper parallax, Stage Manager, iPad app compatibility, iPadOS mode, and internal/research flags. Tick what you want, tap Activer.
+
+Island backs up the original plist before every write, then respring's automatically.
+
+This is a fork of [GestaltEdit](https://github.com/frs0n/GestaltEdit) restyled around a dark, minimal UI — it keeps the full tweak catalog but drops the manual field editor and backup-library screens.
 
 ## Requirements
 

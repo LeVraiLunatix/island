@@ -4,7 +4,7 @@
 
 # Island
 
-**在不支持的 iPhone 上强制开启灵动岛，直接在设备上操作**
+**专注灵动岛与 Apple Intelligence 的 MobileGestalt 工具，直接在设备上操作**
 
 <p>
   <a href="https://github.com/LeVraiLunatix/island/releases/latest"><img src="https://img.shields.io/github/v/release/LeVraiLunatix/island?style=flat-square&label=release&color=6E56CF" alt="最新版本"></a>
@@ -20,7 +20,7 @@
 
 </div>
 
-Island 通过 `bad_query` 沙盒扩展漏洞，把灵动岛的 `ArtworkDeviceSubType` 写入 `com.apple.MobileGestalt.plist`，然后自动注销 SpringBoard。选一个机型子类型，点「Activer」即可。
+Island 通过 `bad_query` 沙盒扩展漏洞，直接在设备上编辑 `com.apple.MobileGestalt.plist`，然后自动注销 SpringBoard。勾选需要的项目，点「Activer」即可。
 
 > [!WARNING]
 > 本项目使用私有 API 沙盒逃逸并修改系统缓存数据，仅在其针对的 iOS/iPadOS 27 beta 版本上有效。错误的取值可能破坏系统功能，严重时需要刷机恢复。请仅在你本人拥有的设备上使用。
@@ -30,9 +30,15 @@ Island 通过 `bad_query` 沙盒扩展漏洞，把灵动岛的 `ArtworkDeviceSub
 
 ## 功能
 
-只有一个开关：选择灵动岛机型子类型（iPhone 14 Pro、14 Pro Max、16 Pro、16 Pro Max 或 iPhone Air）并应用。每次写入前都会自动备份原始 plist，写入后自动注销。
+**灵动岛** —— 选择机型子类型（iPhone 14 Pro、14 Pro Max、16 Pro、16 Pro Max 或 iPhone Air）并应用。
 
-本项目是 [GestaltEdit](https://github.com/frs0n/GestaltEdit) 的精简分支，只保留了灵动岛这一条路径——没有字段编辑器，没有其他功能预设，也没有备份库界面。
+**Apple Intelligence** —— 在不支持的设备上强制开启美区，必要时进行设备身份仿冒。
+
+**功能预设** —— 开关机铃声、充电限制、轻点唤醒、相机控制、Apple Pencil、操作按钮、车祸检测、息屏显示、壁纸视差、台前调度、iPad 应用兼容性、iPadOS 模式，以及内部/研究相关开关。勾选需要的，点「Activer」。
+
+每次写入前都会自动备份原始 plist，写入后自动注销。
+
+本项目是 [GestaltEdit](https://github.com/frs0n/GestaltEdit) 的分支，改用深色极简界面——保留完整的功能预设，但去掉了手动字段编辑器和备份库界面。
 
 ## 系统要求
 

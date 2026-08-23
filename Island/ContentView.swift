@@ -8,7 +8,8 @@ struct ContentView: View {
             Color.black.ignoresSafeArea()
 
             if GestaltAccess.isRunningSupportedOS() {
-                mainContent
+                TweakWorkbench()
+                    .task { viewModel.load() }
             } else {
                 UnsupportedOSView()
             }
@@ -18,7 +19,6 @@ struct ContentView: View {
             }
         }
         .preferredColorScheme(.dark)
-        .task { viewModel.load() }
         .alert(item: $viewModel.notice) { notice in
             Alert(
                 title: Text(notice.title),
@@ -26,81 +26,6 @@ struct ContentView: View {
                 dismissButton: .default(Text("OK"))
             )
         }
-    }
-
-    private var mainContent: some View {
-        VStack(spacing: 28) {
-            Text("Island")
-                .font(.system(size: 48, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .padding(.top, 48)
-
-            statusView
-
-            Spacer()
-
-            VStack(spacing: 6) {
-                Text("SUBTYPE")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.4))
-                    .kerning(1.2)
-
-                Picker("Subtype", selection: $viewModel.dynamicIslandSubtype) {
-                    ForEach(DynamicIslandOption.all) { option in
-                        Text(option.title)
-                            .tag(option.subtype)
-                    }
-                }
-                .pickerStyle(.wheel)
-                .colorScheme(.dark)
-                .frame(height: 150)
-            }
-            .padding(.vertical, 12)
-            .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .padding(.horizontal, 24)
-
-            Button {
-                viewModel.applySelectedTweaks()
-            } label: {
-                Text("Activer")
-                    .font(.title3.weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.white)
-            .foregroundStyle(.black)
-            .disabled(viewModel.plist == nil || viewModel.isBusy)
-            .padding(.horizontal, 24)
-
-            Spacer()
-
-            Text("Redémarre SpringBoard automatiquement")
-                .font(.footnote)
-                .foregroundStyle(.white.opacity(0.35))
-                .padding(.bottom, 28)
-        }
-    }
-
-    @ViewBuilder
-    private var statusView: some View {
-        HStack(spacing: 8) {
-            if viewModel.plist != nil {
-                Circle().fill(.green).frame(width: 8, height: 8)
-                Text("Connecté")
-                    .foregroundStyle(.green)
-            } else if viewModel.isBusy || !viewModel.hasAttemptedLoad {
-                ProgressView()
-                    .tint(.white)
-                Text("Connexion…")
-                    .foregroundStyle(.white.opacity(0.6))
-            } else {
-                Circle().fill(.red).frame(width: 8, height: 8)
-                Text("Erreur de connexion")
-                    .foregroundStyle(.red)
-            }
-        }
-        .font(.subheadline.weight(.medium))
     }
 }
 
@@ -110,14 +35,203 @@ private struct UnsupportedOSView: View {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 44))
                 .foregroundStyle(.white.opacity(0.5))
-            Text("OS Non Supporté")
+            Text("Unsupported OS Version")
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(.white)
-            Text("Island fonctionne uniquement sur iOS/iPadOS 27 beta 1 à beta 4.")
+            Text("Island currently supports only iOS and iPadOS 27 beta 1 through beta 4.")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.white.opacity(0.6))
         }
         .padding(24)
+    }
+}
+
+private struct TweakWorkbench: View {
+    @EnvironmentObject private var viewModel: GestaltViewModel
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section { deviceStatus }
+                    .listRowBackground(Color.white.opacity(0.06))
+
+                if viewModel.plist != nil {
+                    dynamicIslandSection
+                    aiRegionSection
+                    modelNameSection
+
+                    ForEach(GestaltTweakCategory.allCases) { category in
+                        tweakSection(category)
+                    }
+                }
+            }
+            .scrollContentBackground(.hidden)
+            .background(Color.black)
+            .navigationTitle("Island")
+            .navigationBarTitleDisplayMode(.large)
+            .refreshable { viewModel.load() }
+            .safeAreaInset(edge: .bottom) {
+                if viewModel.hasStagedTweaks {
+                    applyBar
+                }
+            }
+        }
+        .tint(.white)
+    }
+
+    private func tweakSection(_ category: GestaltTweakCategory) -> some View {
+        let definitions = GestaltTweakCatalog.definitions.filter { $0.category == category }
+        return Section(category.label) {
+            ForEach(definitions) { definition in
+                TweakToggle(
+                    definition: definition,
+                    isOn: Binding(
+                        get: { viewModel.selectedTweaks.contains(definition.id) },
+                        set: { viewModel.setTweak(definition.id, enabled: $0) }
+                    )
+                )
+            }
+        }
+        .listRowBackground(Color.white.opacity(0.06))
+    }
+
+    @ViewBuilder
+    private var deviceStatus: some View {
+        if viewModel.plist == nil {
+            HStack(spacing: 10) {
+                if viewModel.isBusy || !viewModel.hasAttemptedLoad {
+                    ProgressView()
+                        .tint(.white)
+                        .controlSize(.small)
+                    Text("Reading MobileGestalt…")
+                        .foregroundStyle(.white.opacity(0.7))
+                } else {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Unable to read MobileGestalt")
+                            .foregroundStyle(.white)
+                        Button("Reload", action: viewModel.load)
+                            .font(.footnote)
+                    }
+                }
+            }
+        } else {
+            LabeledContent {
+                Text("Connected")
+                    .foregroundStyle(.green)
+            } label: {
+                Label(viewModel.aiRegionProfile?.marketingName ?? String(localized: "Current Device"), systemImage: "iphone")
+                    .foregroundStyle(.white)
+            }
+        }
+    }
+
+    private var dynamicIslandSection: some View {
+        Section {
+            Picker("Subtype", selection: $viewModel.dynamicIslandSubtype) {
+                Text("No Change").tag(Int?.none)
+                ForEach(DynamicIslandOption.all) { option in
+                    Text(option.title).tag(Int?.some(option.subtype))
+                }
+            }
+            .tint(.white)
+        } header: {
+            Text("Dynamic Island")
+        } footer: {
+            Text("Selecting a subtype writes ArtworkDeviceSubType and the Dynamic Island support flag.")
+        }
+        .listRowBackground(Color.white.opacity(0.06))
+    }
+
+    private var aiRegionSection: some View {
+        Section {
+            Toggle(
+                isOn: Binding(
+                    get: { viewModel.stagesAIRegion },
+                    set: { viewModel.setAIRegion(enabled: $0) }
+                )
+            ) {
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(spacing: 6) {
+                        Text("Enable Apple Intelligence (US Region)")
+                        if viewModel.requiresForcedAIEnable {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.caption)
+                                .foregroundStyle(.orange)
+                                .accessibilityLabel("High Risk")
+                        }
+                    }
+                    if viewModel.requiresForcedAIEnable {
+                        Text("Unsupported device: force enable with device identity spoofing. Face ID or system stability may be affected.")
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+        } header: {
+            Text("Apple Intelligence")
+        }
+        .listRowBackground(Color.white.opacity(0.06))
+    }
+
+    private var modelNameSection: some View {
+        Section("Device Name") {
+            Toggle("Change model name in About", isOn: $viewModel.changesModelName)
+            if viewModel.changesModelName {
+                TextField("Model Name", text: $viewModel.modelName)
+                    .textInputAutocapitalization(.words)
+            }
+        }
+        .listRowBackground(Color.white.opacity(0.06))
+    }
+
+    private var applyBar: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(String(format: String(localized: "%d pending changes"), viewModel.stagedChangeCount))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white)
+                Text("Automatic backup · restarts SpringBoard")
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.5))
+            }
+            Spacer()
+            Button("Activer") { viewModel.applySelectedTweaks() }
+                .buttonStyle(.borderedProminent)
+                .tint(.white)
+                .foregroundStyle(.black)
+                .disabled(viewModel.isBusy)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(.black.opacity(0.95))
+    }
+}
+
+private struct TweakToggle: View {
+    let definition: GestaltTweakDefinition
+    @Binding var isOn: Bool
+
+    var body: some View {
+        Toggle(isOn: $isOn) {
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: 6) {
+                    Text(definition.title)
+                    if definition.isRisky {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                            .accessibilityLabel("High Risk")
+                    }
+                }
+                Text(definition.detail)
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.5))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
     }
 }
 

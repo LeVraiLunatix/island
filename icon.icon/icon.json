@@ -17,21 +17,10 @@
     {
       "layers" : [
         {
-          "image-name" : "Image 3.svg",
-          "name" : "Image 3",
+          "image-name" : "Island.svg",
+          "name" : "Island",
           "position" : {
-            "scale" : 3,
-            "translation-in-points" : [
-              0,
-              0
-            ]
-          }
-        },
-        {
-          "image-name" : "Image 2.svg",
-          "name" : "Image 2",
-          "position" : {
-            "scale" : 6.5,
+            "scale" : 3.4,
             "translation-in-points" : [
               0,
               0
