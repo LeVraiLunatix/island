@@ -144,6 +144,13 @@ enum CustomWallpaperTemplate {
     /// canvas so the pre-cropped photo fills it with no distortion. When
     /// `animated` is true, adds the gentle zoom/pan loop above.
     static func imageLayerCAML(imageFileName: String, animated: Bool) -> String {
+        // The verified working animation (rotation.z on Apollo15's
+        // "spacecraft" layer) declares the animated key path's own value as
+        // a plain layer attribute too, matching the animation's starting
+        // value, in addition to the <animations> block. Mirroring that here
+        // for transform.scale/position.x/position.y -- omitting it may be
+        // exactly why the first attempt animated nothing.
+        let animatedAttributes = animated ? " transform.scale=\"1.0\" position.x=\"195\" position.y=\"422\"" : ""
         let animationsBlock = animated ? "\n        \(breathingAnimations)" : ""
         return """
 <?xml version="1.0" encoding="UTF-8"?>
@@ -151,7 +158,7 @@ enum CustomWallpaperTemplate {
   <CALayer id="1761670838602" name="Root Layer" bounds="0 0 390 844" position="195 422" geometryFlipped="0" backgroundColor="0.898 0.9059 0.9216" allowsEdgeAntialiasing="1" allowsGroupOpacity="1" contentsFormat="RGBA8" cornerCurve="circular">
     <modules/>
     <sublayers>
-      <CALayer id="2xfesgvaphemhatcj75" name="photo" bounds="0 0 390 844" position="195 422" geometryFlipped="0" masksToBounds="1" opacity="1" transform.rotation.z="0" transform.rotation.x="0" transform.rotation.y="0" transform="rotate(0deg) rotate(0deg, 0, 1, 0) rotate(0deg, 1, 0, 0)" allowsEdgeAntialiasing="1" allowsGroupOpacity="1" contentsFormat="RGBA8" cornerCurve="circular">
+      <CALayer id="2xfesgvaphemhatcj75" name="photo" bounds="0 0 390 844" position="195 422" geometryFlipped="0" masksToBounds="1" opacity="1" transform.rotation.z="0" transform.rotation.x="0" transform.rotation.y="0" transform="rotate(0deg) rotate(0deg, 0, 1, 0) rotate(0deg, 1, 0, 0)"\(animatedAttributes) allowsEdgeAntialiasing="1" allowsGroupOpacity="1" contentsFormat="RGBA8" cornerCurve="circular">
         <contents>
           <CGImage src="assets/\(imageFileName)"/>
         </contents>\(animationsBlock)
