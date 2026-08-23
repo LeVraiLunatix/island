@@ -127,6 +127,96 @@ extension GestaltPlist {
         setCacheExtra(artwork, forKey: key)
     }
 
+    private static let artworkDeviceKey = "oPeik/9e8lQWMszEjbPzng"
+    private static let dynamicIslandCompatibilityKey = "YlEtTtHlNesRBMal1CqRaA"
+    private static let aiRegionOverrideKeys = [
+        "A62OafQ85EJAiiqKn4agtg",
+        "h9jDsbgj7xIVeIQ8S3/X3Q",
+        "oYicEKzVTz4/CxxE05pEgQ",
+        "5pYKlGnYYBzGvAlIU8RjEQ",
+        "h63QSdBCiT/z0WU6rdQv6Q",
+        "yK+xavymRGZ3xWc1tb8XDg",
+        "97JDvERpVwO+GHtthIh7hA"
+    ]
+
+    /// Clears every MobileGestalt override Island's UI can write -- every
+    /// capability preset, the Dynamic Island subtype/compatibility flag, the
+    /// spoofed device name, and the Apple Intelligence region spoof -- and
+    /// flips the iPadOS-mode CacheData bit back off if it was set. Works
+    /// directly off the plist that's currently on-device, so unlike a
+    /// backup restore it needs no prior state capture and still works after
+    /// the app has been reinstalled.
+    mutating func removeAllIslandOverrides() {
+        var extra = cacheExtra
+        for definition in GestaltTweakCatalog.definitions {
+            for key in definition.values.keys {
+                extra.removeValue(forKey: key)
+            }
+        }
+        for key in Self.aiRegionOverrideKeys {
+            extra.removeValue(forKey: key)
+        }
+        extra.removeValue(forKey: Self.dynamicIslandCompatibilityKey)
+        cacheExtra = extra
+
+        if var artwork = cacheExtra[Self.artworkDeviceKey] as? [String: Any] {
+            artwork.removeValue(forKey: "ArtworkDeviceSubType")
+            artwork.removeValue(forKey: "ArtworkDeviceProductDescription")
+            setCacheExtra(artwork, forKey: Self.artworkDeviceKey)
+        }
+
+        disableIPadOSCacheDataIfNeeded()
+    }
+
+    /// Best-effort mirror of `enableIPadOSCacheData()`: flips the same bit
+    /// back to its disabled value ("1") if -- and only if -- it currently
+    /// reads as enabled ("3"). Silently does nothing if the marker can't be
+    /// located or doesn't look like it was ever flipped, since this runs as
+    /// part of a broad reset and must never throw or corrupt CacheData.
+    private mutating func disableIPadOSCacheDataIfNeeded() {
+        guard let cacheData = dict["CacheData"] as? Data else { return }
+        var hex = Array(cacheData.map { String(format: "%02x", $0) }.joined())
+        let sliceStart = 1616
+        let sliceLength = 200
+        guard hex.count > sliceStart else { return }
+
+        let end = min(hex.count, sliceStart + sliceLength)
+        let slice = String(hex[sliceStart..<end])
+        guard let regex = try? NSRegularExpression(pattern: "0+(?:5555)*([0-9a-f]{4})") else { return }
+        let nsRange = NSRange(slice.startIndex..<slice.endIndex, in: slice)
+        var matchedOffset: Int?
+        regex.enumerateMatches(in: slice, range: nsRange) { match, _, stop in
+            guard let range = match.flatMap({ Range($0.range(at: 1), in: slice) }) else { return }
+            let value = slice[range]
+            if value.filter({ $0 != "0" }).count >= 3 {
+                matchedOffset = sliceStart + slice.distance(from: slice.startIndex, to: range.lowerBound)
+                stop.pointee = true
+            }
+        }
+        guard let offset = matchedOffset else { return }
+
+        let rightOffset = offset + 13
+        let leftOffset = offset - 67
+        guard leftOffset > 0, rightOffset < hex.count - 1 else { return }
+        for position in [leftOffset, rightOffset] {
+            guard ["1", "3"].contains(String(hex[position])),
+                  hex[position - 1] == "0", hex[position + 1] == "0" else { return }
+        }
+        guard hex[leftOffset] == "3" else { return }
+
+        hex[leftOffset] = "1"
+        let updatedHex = String(hex)
+        var updatedData = Data(capacity: updatedHex.count / 2)
+        var index = updatedHex.startIndex
+        while index < updatedHex.endIndex {
+            let next = updatedHex.index(index, offsetBy: 2)
+            guard let byte = UInt8(updatedHex[index..<next], radix: 16) else { return }
+            updatedData.append(byte)
+            index = next
+        }
+        dict["CacheData"] = updatedData
+    }
+
     private mutating func enableIPadOSCacheData() throws {
         guard let cacheData = dict["CacheData"] as? Data else {
             throw GestaltTweakError.cacheDataMissing

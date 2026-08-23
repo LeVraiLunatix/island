@@ -265,27 +265,18 @@ private struct ResetDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 Label(
-                    "Restaure com.apple.MobileGestalt.plist à l'état capturé par la toute première sauvegarde d'Island, avant la moindre modification, puis redémarre SpringBoard.",
+                    "Efface tout ce qu'Island a écrit sur cet appareil — Dynamic Island, Apple Intelligence, nom d'appareil, tous les réglages — puis redémarre SpringBoard.",
                     systemImage: "arrow.uturn.backward.circle.fill"
                 )
                 .font(.subheadline)
                 .foregroundStyle(.white)
 
                 Label(
-                    "Cela annule Dynamic Island, Apple Intelligence, le nom d'appareil et tous les autres réglages appliqués par Island. Les fonds d'écran installés via Pocket Poster ne sont pas concernés.",
+                    "Fonctionne directement sur l'état actuel de l'appareil, même après une réinstallation d'Island. Les fonds d'écran installés via Pocket Poster ne sont pas concernés.",
                     systemImage: "info.circle"
                 )
                 .font(.caption)
                 .foregroundStyle(.white.opacity(0.6))
-
-                if !viewModel.canRestoreOriginal {
-                    Label(
-                        "Aucune sauvegarde disponible : Island n'a encore rien modifié sur cet appareil.",
-                        systemImage: "checkmark.circle"
-                    )
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.6))
-                }
             }
             .padding(18)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -301,7 +292,7 @@ private struct ResetDetailView: View {
             }
             .buttonStyle(.glassProminent)
             .tint(.red)
-            .disabled(!viewModel.canRestoreOriginal || viewModel.isBusy)
+            .disabled(viewModel.isBusy)
             .padding(.horizontal, 20)
         }
         .background(Color.black)
@@ -313,7 +304,7 @@ private struct ResetDetailView: View {
             titleVisibility: .visible
         ) {
             Button("Tout réinitialiser", role: .destructive) {
-                viewModel.restoreOriginalPlist()
+                viewModel.resetIslandChanges()
             }
             Button("Annuler", role: .cancel) {}
         } message: {
