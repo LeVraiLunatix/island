@@ -1,5 +1,6 @@
 import Foundation
 import UIKit
+import ZIPFoundation
 
 enum CustomWallpaperBuilderError: LocalizedError {
     case imageEncodingFailed
