@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 import ZIPFoundation
 
@@ -149,7 +150,7 @@ final class PosterBoardInstaller: ObservableObject {
         let destinationRoot = "/var/mobile/Containers/Data/Application/\(appHash)/Library/Application Support/PRBPosterExtensionDataStore/\(extensionVersion)/Extensions/\(extensionID)/descriptors"
 
         var leaseError: NSString?
-        guard let lease = BadQueryLease.lease(forPath: destinationRoot, error: &leaseError) else {
+        guard let lease = BadQueryLeaseHelper.acquireLease(path: destinationRoot, errorMessage: &leaseError) else {
             throw PosterBoardError.sandboxExtensionFailed((leaseError as String?) ?? "raison inconnue")
         }
         defer { lease.invalidate() }
