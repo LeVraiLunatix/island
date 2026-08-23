@@ -75,7 +75,7 @@ final class GestaltViewModel: ObservableObject {
         if enabled, requiresForcedAIEnable {
             notice = GestaltNotice(
                 kind: .riskWarning,
-                message: String(localized: "This device does not officially support Apple Intelligence. Force enabling spoofs the product, hardware, and CPU model. It may temporarily break Face ID, cause system instability or boot loops, and could require restoring the device. A backup will be created before writing.")
+                message: "Cet appareil ne prend pas officiellement en charge Apple Intelligence. L'activation forcée usurpe le produit, le matériel et le modèle du processeur. Cela peut temporairement casser Face ID, causer une instabilité système ou des boucles de démarrage, et peut nécessiter une restauration de l'appareil. Une sauvegarde sera créée avant l'écriture."
             )
         }
     }
@@ -180,9 +180,9 @@ private enum IslandError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .invalidPlist: String(localized: "The MobileGestalt plist is not a valid dictionary.")
-        case .verificationFailed: String(localized: "The MobileGestalt values after writing do not match the expected values.")
-        case .emptyModelName: String(localized: "The device model name cannot be empty.")
+        case .invalidPlist: "Le plist MobileGestalt n'est pas un dictionnaire valide."
+        case .verificationFailed: "Les valeurs MobileGestalt après écriture ne correspondent pas aux valeurs attendues."
+        case .emptyModelName: "Le nom du modèle de l'appareil ne peut pas être vide."
         }
     }
 }

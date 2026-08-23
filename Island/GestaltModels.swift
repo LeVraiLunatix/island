@@ -25,9 +25,9 @@ struct GestaltNotice: Identifiable {
 
     var title: String {
         switch kind {
-        case .error: String(localized: "Operation Failed")
-        case .backupCreated: String(localized: "Backup Complete")
-        case .riskWarning: String(localized: "High Risk")
+        case .error: "Échec de l'opération"
+        case .backupCreated: "Sauvegarde effectuée"
+        case .riskWarning: "Risque élevé"
         }
     }
 }
