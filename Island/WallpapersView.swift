@@ -119,22 +119,20 @@ private struct WallpaperThumbnail: View {
 private struct WallpaperDetailSheet: View {
     let wallpaper: Wallpaper
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var installer = PosterBoardInstaller()
     @State private var pocketPosterFailed = false
+    @State private var installError: String?
+    @State private var installSucceeded = false
+    @State private var showsHashSettings = false
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 18) {
-                    AsyncImage(url: wallpaper.previewURL) { phase in
-                        if case .success(let image) = phase {
-                            image.resizable().scaledToFit()
-                        } else {
-                            Rectangle().fill(Color.white.opacity(0.08))
-                                .frame(height: 240)
-                        }
-                    }
-                    .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-                    .padding(.horizontal, 20)
+                    AnimatedImage(url: wallpaper.previewURL, contentMode: .fit)
+                        .frame(height: 320)
+                        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                        .padding(.horizontal, 20)
 
                     VStack(spacing: 6) {
                         Text(wallpaper.name)
@@ -156,12 +154,54 @@ private struct WallpaperDetailSheet: View {
 
                     VStack(spacing: 12) {
                         Button {
+                            installDirectly()
+                        } label: {
+                            if installer.isInstalling {
+                                HStack {
+                                    ProgressView().tint(.white)
+                                    Text(installer.progressMessage ?? "Installation…")
+                                }
+                                .frame(maxWidth: .infinity)
+                            } else {
+                                Label("Installer dans Island", systemImage: "square.and.arrow.down.badge.checkmark")
+                                    .frame(maxWidth: .infinity)
+                            }
+                        }
+                        .buttonStyle(.glassProminent)
+                        .disabled(installer.isInstalling)
+
+                        if installSucceeded {
+                            Label("Installé. Ouvre Réglages > Fond d'écran sur ton iPhone pour l'appliquer.", systemImage: "checkmark.circle.fill")
+                                .font(.caption)
+                                .foregroundStyle(.green)
+                                .multilineTextAlignment(.center)
+                        }
+                        if let installError {
+                            Text(installError)
+                                .font(.caption)
+                                .foregroundStyle(.orange)
+                                .multilineTextAlignment(.center)
+                        }
+
+                        Button {
+                            showsHashSettings = true
+                        } label: {
+                            Label("Réglages du hash PosterBoard", systemImage: "gearshape")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.glass)
+
+                        Divider()
+                            .overlay(Color.white.opacity(0.15))
+                            .padding(.vertical, 4)
+
+                        Button {
                             openInPocketPoster()
                         } label: {
                             Label("Ouvrir dans Pocket Poster", systemImage: "square.and.arrow.down.on.square")
                                 .frame(maxWidth: .infinity)
                         }
-                        .buttonStyle(.glassProminent)
+                        .buttonStyle(.glass)
 
                         Button {
                             openDownload()
@@ -191,6 +231,22 @@ private struct WallpaperDetailSheet: View {
             }
         }
         .preferredColorScheme(.dark)
+        .sheet(isPresented: $showsHashSettings) {
+            PosterBoardHashSettingsView()
+        }
+    }
+
+    private func installDirectly() {
+        installError = nil
+        installSucceeded = false
+        Task {
+            do {
+                try await installer.install(wallpaper: wallpaper)
+                installSucceeded = true
+            } catch {
+                installError = error.localizedDescription
+            }
+        }
     }
 
     private func openInPocketPoster() {

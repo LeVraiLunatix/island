@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		D13AF45B302AF55100CE898D /* icon.icon in Resources */ = {isa = PBXBuildFile; fileRef = D13AF45A302AF55100CE898D /* icon.icon */; };
+		AA00000000000000000003 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = AA00000000000000000002 /* ZIPFoundation */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 		000000000000000130000000 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				AA00000000000000000003 /* ZIPFoundation in Frameworks */,
 			);
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -66,6 +68,9 @@
 				000000000000000000000010 /* Island */,
 			);
 			name = Island;
+			packageProductDependencies = (
+				AA00000000000000000002 /* ZIPFoundation */,
+			);
 			productName = MyApp;
 			productReference = 000000000000000000000120 /* Island.app */;
 			productType = "com.apple.product-type.application";
@@ -94,6 +99,9 @@
 			);
 			mainGroup = 000000000000000000000001;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				AA00000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+			);
 			preferredProjectObjectVersion = 90;
 			productRefGroup = 000000000000000000000020 /* Products */;
 			projectDirPath = "";
@@ -342,6 +350,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AA00000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.19;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AA00000000000000000002 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA00000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 000000000000000000000000 /* Project object */;
 }
