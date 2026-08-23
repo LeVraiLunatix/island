@@ -49,10 +49,7 @@ struct MenuView: View {
                                     MenuCardView(card: card)
                                 }
                                 .buttonStyle(.plain)
-                                .disabled(
-                                    (card.requiresConnection && viewModel.plist == nil)
-                                        || (card.destination == .reset && !viewModel.canRestoreOriginal)
-                                )
+                                .disabled(card.requiresConnection && viewModel.plist == nil)
                             }
                         }
                     }
