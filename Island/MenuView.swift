@@ -6,6 +6,7 @@ private enum MenuDestination: Hashable {
     case deviceName
     case category(GestaltTweakCategory)
     case wallpapers
+    case faceID
     case reset
 }
 
@@ -31,6 +32,7 @@ struct MenuView: View {
         MenuCard(title: "Matériel", subtitle: "Camera Control, Pencil…", systemImage: "cpu", destination: .category(.hardware)),
         MenuCard(title: "iPad", subtitle: "Stage Manager, apps iPad", systemImage: "ipad", destination: .category(.ipad)),
         MenuCard(title: "Interne & Recherche", subtitle: "Fonctions avancées", systemImage: "wrench.and.screwdriver.fill", destination: .category(.internalFeatures)),
+        MenuCard(title: "Face ID", subtitle: "Diagnostiquer un problème", systemImage: "faceid", destination: .faceID, requiresConnection: false),
         MenuCard(title: "Réinitialiser", subtitle: "Tout retirer de l'appareil", systemImage: "arrow.uturn.backward.circle.fill", destination: .reset)
     ]
 
@@ -73,6 +75,8 @@ struct MenuView: View {
                     CategoryDetailView(category: category)
                 case .wallpapers:
                     WallpapersView()
+                case .faceID:
+                    FaceIDDetailView()
                 case .reset:
                     ResetDetailView()
                 }
