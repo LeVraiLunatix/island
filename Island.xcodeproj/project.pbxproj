@@ -11,14 +11,14 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		000000000000000000000120 /* GestaltEdit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GestaltEdit.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000000120 /* Island.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Island.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D13AF45A302AF55100CE898D /* icon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = icon.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		000000000000000000000010 /* GestaltEdit */ = {
+		000000000000000000000010 /* Island */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = GestaltEdit;
+			path = Island;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -36,7 +36,7 @@
 			isa = PBXGroup;
 			children = (
 				D13AF45A302AF55100CE898D /* icon.icon */,
-				000000000000000000000010 /* GestaltEdit */,
+				000000000000000000000010 /* Island */,
 				000000000000000000000020 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -44,7 +44,7 @@
 		000000000000000000000020 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				000000000000000000000120 /* GestaltEdit.app */,
+				000000000000000000000120 /* Island.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -52,9 +52,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		000000000000000100000000 /* GestaltEdit */ = {
+		000000000000000100000000 /* Island */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 000000000000000110000000 /* Build configuration list for PBXNativeTarget "GestaltEdit" */;
+			buildConfigurationList = 000000000000000110000000 /* Build configuration list for PBXNativeTarget "Island" */;
 			buildPhases = (
 				000000000000000120000000 /* Sources */,
 				000000000000000130000000 /* Frameworks */,
@@ -63,11 +63,11 @@
 			buildRules = (
 			);
 			fileSystemSynchronizedGroups = (
-				000000000000000000000010 /* GestaltEdit */,
+				000000000000000000000010 /* Island */,
 			);
-			name = GestaltEdit;
+			name = Island;
 			productName = MyApp;
-			productReference = 000000000000000000000120 /* GestaltEdit.app */;
+			productReference = 000000000000000000000120 /* Island.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -85,13 +85,12 @@
 					};
 				};
 			};
-			buildConfigurationList = 000000000000000010000000 /* Build configuration list for PBXProject "GestaltEdit" */;
+			buildConfigurationList = 000000000000000010000000 /* Build configuration list for PBXProject "Island" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
-				"zh-Hans",
 			);
 			mainGroup = 000000000000000000000001;
 			minimizedProjectReferenceProxies = 1;
@@ -100,7 +99,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				000000000000000100000000 /* GestaltEdit */,
+				000000000000000100000000 /* Island */,
 			);
 		};
 /* End PBXProject section */
@@ -123,7 +122,7 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		000000000000000011000000 /* Debug configuration for PBXProject "GestaltEdit" */ = {
+		000000000000000011000000 /* Debug configuration for PBXProject "Island" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -188,7 +187,7 @@
 			};
 			name = Debug;
 		};
-		000000000000000012000000 /* Release configuration for PBXProject "GestaltEdit" */ = {
+		000000000000000012000000 /* Release configuration for PBXProject "Island" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -245,7 +244,7 @@
 			};
 			name = Release;
 		};
-		000000000000000111000000 /* Debug configuration for PBXNativeTarget "GestaltEdit" */ = {
+		000000000000000111000000 /* Debug configuration for PBXNativeTarget "Island" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = icon;
@@ -255,7 +254,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = GestaltEdit;
+				INFOPLIST_KEY_CFBundleDisplayName = Island;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -269,7 +268,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = me.ssus.gestaltedit;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lvnatixx.island;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -277,14 +276,14 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "GestaltEdit/GestaltEdit-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Island/Island-Bridging-Header.h";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		000000000000000112000000 /* Release configuration for PBXNativeTarget "GestaltEdit" */ = {
+		000000000000000112000000 /* Release configuration for PBXNativeTarget "Island" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = icon;
@@ -294,7 +293,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = GestaltEdit;
+				INFOPLIST_KEY_CFBundleDisplayName = Island;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -308,7 +307,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MARKETING_VERSION = 1.2;
-				PRODUCT_BUNDLE_IDENTIFIER = me.ssus.gestaltedit;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lvnatixx.island;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -316,7 +315,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "GestaltEdit/GestaltEdit-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Island/Island-Bridging-Header.h";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -326,19 +325,19 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		000000000000000010000000 /* Build configuration list for PBXProject "GestaltEdit" */ = {
+		000000000000000010000000 /* Build configuration list for PBXProject "Island" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000011000000 /* Debug configuration for PBXProject "GestaltEdit" */,
-				000000000000000012000000 /* Release configuration for PBXProject "GestaltEdit" */,
+				000000000000000011000000 /* Debug configuration for PBXProject "Island" */,
+				000000000000000012000000 /* Release configuration for PBXProject "Island" */,
 			);
 			defaultConfigurationName = Release;
 		};
-		000000000000000110000000 /* Build configuration list for PBXNativeTarget "GestaltEdit" */ = {
+		000000000000000110000000 /* Build configuration list for PBXNativeTarget "Island" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000111000000 /* Debug configuration for PBXNativeTarget "GestaltEdit" */,
-				000000000000000112000000 /* Release configuration for PBXNativeTarget "GestaltEdit" */,
+				000000000000000111000000 /* Debug configuration for PBXNativeTarget "Island" */,
+				000000000000000112000000 /* Release configuration for PBXNativeTarget "Island" */,
 			);
 			defaultConfigurationName = Release;
 		};

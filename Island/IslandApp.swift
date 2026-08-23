@@ -1,17 +1,13 @@
 //
-//  GestaltEditApp.swift
-//  GestaltEdit
+//  IslandApp.swift
+//  Island
 //
 
 import SwiftUI
 
 @main
-struct GestaltEditApp: App {
+struct IslandApp: App {
     @StateObject private var viewModel = GestaltViewModel()
-
-    init() {
-        AutomationCommand.runIfNeeded()
-    }
 
     var body: some Scene {
         WindowGroup {
