@@ -14,18 +14,26 @@ struct FaceIDStatus {
     let availability: Availability
     let identitySpoofActive: Bool
     let spoofedProductType: String?
+    let dynamicIslandOverrideActive: Bool
+    let dynamicIslandSubtypeLabel: String?
 }
 
 enum FaceIDDiagnostics {
     private static let spoofFlagKey = "A62OafQ85EJAiiqKn4agtg"
     private static let spoofProductTypeKey = "h9jDsbgj7xIVeIQ8S3/X3Q"
+    private static let dynamicIslandCompatibilityKey = "YlEtTtHlNesRBMal1CqRaA"
+    private static let artworkDeviceKey = "oPeik/9e8lQWMszEjbPzng"
 
     /// Checks Face ID through the public LocalAuthentication API (the same
     /// check any app performs before offering biometric sign-in), then
-    /// cross-references the live MobileGestalt plist for the device-identity
-    /// spoof Island's Apple Intelligence toggle can leave behind -- the AI
-    /// Intelligence screen already warns this can break Face ID, since
-    /// TrueDepth authentication expects the real product/hardware/CPU model.
+    /// cross-references the live MobileGestalt plist for two overrides
+    /// Island's own screens can leave active: the device-identity spoof
+    /// from Apple Intelligence (explicitly flagged as a Face ID risk
+    /// already), and the Dynamic Island subtype override -- which changes
+    /// which physical TrueDepth housing/camera layout the system believes
+    /// it has. The latter link is unconfirmed, but it's the app's core
+    /// feature and worth surfacing since it touches the exact device
+    /// attribute Face ID calibration is keyed on.
     static func currentStatus(plist: GestaltPlist?) -> FaceIDStatus {
         let context = LAContext()
         var evaluationError: NSError?
@@ -53,11 +61,20 @@ enum FaceIDDiagnostics {
         let spoofedProductType = cacheExtra[spoofProductTypeKey] as? String
         let spoofActive = (cacheExtra[spoofFlagKey] as? Int == 1) && spoofedProductType != nil
 
+        let artwork = cacheExtra[artworkDeviceKey] as? [String: Any]
+        let subtype = artwork?["ArtworkDeviceSubType"] as? Int
+        let dynamicIslandActive = (cacheExtra[dynamicIslandCompatibilityKey] as? Int == 1) && subtype != nil
+        let subtypeLabel = subtype.flatMap { value in
+            DynamicIslandOption.all.first { $0.subtype == value }?.title
+        }
+
         return FaceIDStatus(
             biometryType: context.biometryType,
             availability: availability,
             identitySpoofActive: spoofActive,
-            spoofedProductType: spoofedProductType
+            spoofedProductType: spoofedProductType,
+            dynamicIslandOverrideActive: dynamicIslandActive,
+            dynamicIslandSubtypeLabel: subtypeLabel
         )
     }
 }
@@ -107,6 +124,12 @@ struct FaceIDDetailView: View {
                     statusCard(for: status)
                     if status.identitySpoofActive {
                         spoofWarningCard(for: status)
+                    }
+                    if status.dynamicIslandOverrideActive {
+                        dynamicIslandWarningCard(for: status)
+                    }
+                    if status.availability.isAvailable && !status.identitySpoofActive && !status.dynamicIslandOverrideActive {
+                        noOverrideCard
                     }
                 } else {
                     ProgressView()
@@ -173,6 +196,45 @@ struct FaceIDDetailView: View {
             .buttonStyle(.glassProminent)
             .tint(.orange)
             .disabled(viewModel.isBusy)
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+    }
+
+    @ViewBuilder
+    private func dynamicIslandWarningCard(for status: FaceIDStatus) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Dynamic Island modifiée", systemImage: "exclamationmark.triangle.fill")
+                .font(.headline)
+                .foregroundStyle(.orange)
+            Text("Le système croit avoir le boîtier caméra d'un \(status.dynamicIslandSubtypeLabel ?? "autre modèle"). Non confirmé, mais c'est exactement l'attribut d'appareil auquel le calibrage TrueDepth est habituellement lié — si Face ID a lâché après avoir changé ce réglage, c'est le suspect le plus probable.")
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.7))
+            Button {
+                viewModel.resetIslandChanges()
+            } label: {
+                Text("Retirer la modification (Réinitialiser Island)")
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.glassProminent)
+            .tint(.orange)
+            .disabled(viewModel.isBusy)
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+    }
+
+    private var noOverrideCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Aucune trace d'une modification Island", systemImage: "checkmark.circle")
+                .font(.subheadline)
+                .foregroundStyle(.white)
+            Text("Ni la Dynamic Island ni Apple Intelligence ne sont actuellement modifiées sur cet appareil, et le système dit pourtant que Face ID est prêt. Si le déverrouillage échoue quand même : redémarre l'appareil, vérifie qu'aucune coque/protection ne cache la caméra TrueDepth, puis essaie Réglages > Face ID et code > Réinitialiser Face ID et réinscris ton visage. C'est aussi une bêta iOS 27 très précoce — un vrai bug système n'est pas à exclure.")
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.6))
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
