@@ -122,8 +122,9 @@ private struct WallpaperDetailSheet: View {
     @StateObject private var installer = PosterBoardInstaller()
     @State private var pocketPosterFailed = false
     @State private var installError: String?
-    @State private var installSucceeded = false
+    @State private var installResult: PosterBoardInstallResult?
     @State private var showsHashSettings = false
+    @State private var showsRespring = false
 
     var body: some View {
         NavigationStack {
@@ -170,11 +171,29 @@ private struct WallpaperDetailSheet: View {
                         .buttonStyle(.glassProminent)
                         .disabled(installer.isInstalling)
 
-                        if installSucceeded {
-                            Label("Installé. Ouvre Réglages > Fond d'écran sur ton iPhone pour l'appliquer.", systemImage: "checkmark.circle.fill")
+                        if let installResult {
+                            VStack(spacing: 4) {
+                                Label(
+                                    "\(installResult.copiedItemNames.count) fichier(s) copié(s). SpringBoard va redémarrer.",
+                                    systemImage: "checkmark.circle.fill"
+                                )
                                 .font(.caption)
                                 .foregroundStyle(.green)
                                 .multilineTextAlignment(.center)
+
+                                ForEach(installResult.copiedItemNames, id: \.self) { name in
+                                    Text(name)
+                                        .font(.caption2.monospaced())
+                                        .foregroundStyle(.white.opacity(0.5))
+                                }
+                                ForEach(installResult.destinationPaths, id: \.self) { path in
+                                    Text(path)
+                                        .font(.caption2.monospaced())
+                                        .foregroundStyle(.white.opacity(0.4))
+                                        .lineLimit(2)
+                                        .truncationMode(.middle)
+                                }
+                            }
                         }
                         if let installError {
                             Text(installError)
@@ -229,6 +248,11 @@ private struct WallpaperDetailSheet: View {
                     Button("Fermer") { dismiss() }
                 }
             }
+            .overlay {
+                if showsRespring {
+                    NeoSpringView()
+                }
+            }
         }
         .preferredColorScheme(.dark)
         .sheet(isPresented: $showsHashSettings) {
@@ -238,11 +262,13 @@ private struct WallpaperDetailSheet: View {
 
     private func installDirectly() {
         installError = nil
-        installSucceeded = false
+        installResult = nil
         Task {
             do {
-                try await installer.install(wallpaper: wallpaper)
-                installSucceeded = true
+                let result = try await installer.install(wallpaper: wallpaper)
+                installResult = result
+                try? await Task.sleep(for: .seconds(1))
+                showsRespring = true
             } catch {
                 installError = error.localizedDescription
             }

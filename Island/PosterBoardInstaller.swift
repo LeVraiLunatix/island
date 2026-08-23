@@ -5,8 +5,10 @@ import ZIPFoundation
 enum PosterBoardError: LocalizedError {
     case missingAppHash
     case invalidTendie
+    case noDescriptorsFound
     case sandboxExtensionFailed(String)
     case destinationMissing
+    case nothingCopied
     case fileOperationFailed(String)
 
     var errorDescription: String? {
@@ -15,14 +17,23 @@ enum PosterBoardError: LocalizedError {
             "Renseigne d'abord le hash de conteneur PosterBoard dans les réglages."
         case .invalidTendie:
             "Ce fichier .tendies est invalide ou dans un format non pris en charge."
+        case .noDescriptorsFound:
+            "Aucun descripteur trouvé dans ce fichier .tendies après extraction — la structure ne correspond pas à ce qu'Island attend."
         case .sandboxExtensionFailed(let detail):
             "bad_query n'a pas pu accéder au conteneur de PosterBoard : \(detail)"
         case .destinationMissing:
             "Dossier introuvable dans le conteneur PosterBoard. Ouvre d'abord Réglages > Fond d'écran sur ton iPhone pour que PosterBoard crée sa structure, ou vérifie que le hash renseigné est correct."
+        case .nothingCopied:
+            "Le dossier de descripteurs de ce .tendies était vide : rien n'a été copié."
         case .fileOperationFailed(let detail):
             "Écriture impossible : \(detail)"
         }
     }
+}
+
+struct PosterBoardInstallResult {
+    let copiedItemNames: [String]
+    let destinationPaths: [String]
 }
 
 /// Installs a Cowabunga .tendies wallpaper package directly into PosterBoard's
@@ -39,7 +50,8 @@ final class PosterBoardInstaller: ObservableObject {
 
     private static let extensionVersion = "61"
 
-    func install(wallpaper: Wallpaper) async throws {
+    @discardableResult
+    func install(wallpaper: Wallpaper) async throws -> PosterBoardInstallResult {
         let appHash = PosterBoardHashStore.hash.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !appHash.isEmpty else { throw PosterBoardError.missingAppHash }
         guard let downloadURL = wallpaper.downloadURL else { throw PosterBoardError.invalidTendie }
@@ -57,16 +69,26 @@ final class PosterBoardInstaller: ObservableObject {
         let unzippedDir = try Self.unzip(tendieData)
         defer { try? FileManager.default.removeItem(at: unzippedDir) }
 
-        guard let descriptors = try Self.descriptors(in: unzippedDir) else {
-            throw PosterBoardError.invalidTendie
+        guard let descriptors = try Self.descriptors(in: unzippedDir), !descriptors.isEmpty else {
+            throw PosterBoardError.noDescriptorsFound
         }
 
         progressMessage = "Installation dans PosterBoard…"
+        var copiedNames: [String] = []
+        var destinationPaths: [String] = []
         for (extensionID, descriptorDirs) in descriptors {
             for descriptorDir in descriptorDirs {
-                try Self.install(descriptorDir: descriptorDir, extensionID: extensionID, appHash: appHash)
+                let (names, destination) = try Self.install(descriptorDir: descriptorDir, extensionID: extensionID, appHash: appHash)
+                copiedNames.append(contentsOf: names)
+                destinationPaths.append(destination)
             }
         }
+
+        guard !copiedNames.isEmpty else {
+            throw PosterBoardError.nothingCopied
+        }
+
+        return PosterBoardInstallResult(copiedItemNames: copiedNames, destinationPaths: destinationPaths)
     }
 
     // MARK: - Unzip
@@ -96,6 +118,7 @@ final class PosterBoardInstaller: ObservableObject {
             switch entry.lastPathComponent.lowercased() {
             case "container":
                 let extensionsDir = entry.appendingPathComponent("Library/Application Support/PRBPosterExtensionDataStore/\(extensionVersion)/Extensions")
+                guard FileManager.default.fileExists(atPath: extensionsDir.path) else { continue }
                 var result: [String: [URL]] = [:]
                 for ext in try FileManager.default.contentsOfDirectory(at: extensionsDir, includingPropertiesForKeys: nil, options: .skipsHiddenFiles) {
                     result[ext.lastPathComponent] = [ext.appendingPathComponent("descriptors")]
@@ -146,7 +169,7 @@ final class PosterBoardInstaller: ObservableObject {
 
     // MARK: - Privileged write via bad_query
 
-    private static func install(descriptorDir: URL, extensionID: String, appHash: String) throws {
+    private static func install(descriptorDir: URL, extensionID: String, appHash: String) throws -> (names: [String], destination: String) {
         let destinationRoot = "/var/mobile/Containers/Data/Application/\(appHash)/Library/Application Support/PRBPosterExtensionDataStore/\(extensionVersion)/Extensions/\(extensionID)/descriptors"
 
         var leaseError: NSString?
@@ -159,6 +182,11 @@ final class PosterBoardInstaller: ObservableObject {
             throw PosterBoardError.destinationMissing
         }
 
+        guard FileManager.default.fileExists(atPath: descriptorDir.path) else {
+            throw PosterBoardError.noDescriptorsFound
+        }
+
+        var copiedNames: [String] = []
         for entry in try FileManager.default.contentsOfDirectory(at: descriptorDir, includingPropertiesForKeys: nil, options: .skipsHiddenFiles) {
             guard entry.lastPathComponent != "__MACOSX" else { continue }
             randomizeWallpaperID(at: entry)
@@ -169,9 +197,12 @@ final class PosterBoardInstaller: ObservableObject {
             }
             do {
                 try FileManager.default.copyItem(at: entry, to: destination)
+                copiedNames.append(entry.lastPathComponent)
             } catch {
                 throw PosterBoardError.fileOperationFailed(error.localizedDescription)
             }
         }
+
+        return (copiedNames, destinationRoot)
     }
 }
