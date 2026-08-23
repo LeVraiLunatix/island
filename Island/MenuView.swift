@@ -6,6 +6,7 @@ private enum MenuDestination: Hashable {
     case deviceName
     case category(GestaltTweakCategory)
     case wallpapers
+    case reset
 }
 
 private struct MenuCard: Identifiable {
@@ -29,7 +30,8 @@ struct MenuView: View {
         MenuCard(title: "Affichage", subtitle: "AOD, parallaxe, Liquid Glass", systemImage: "sun.max.fill", destination: .category(.display)),
         MenuCard(title: "Matériel", subtitle: "Camera Control, Pencil…", systemImage: "cpu", destination: .category(.hardware)),
         MenuCard(title: "iPad", subtitle: "Stage Manager, apps iPad", systemImage: "ipad", destination: .category(.ipad)),
-        MenuCard(title: "Interne & Recherche", subtitle: "Fonctions avancées", systemImage: "wrench.and.screwdriver.fill", destination: .category(.internalFeatures))
+        MenuCard(title: "Interne & Recherche", subtitle: "Fonctions avancées", systemImage: "wrench.and.screwdriver.fill", destination: .category(.internalFeatures)),
+        MenuCard(title: "Réinitialiser", subtitle: "Tout retirer de l'appareil", systemImage: "arrow.uturn.backward.circle.fill", destination: .reset)
     ]
 
     private let columns = [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)]
@@ -47,7 +49,10 @@ struct MenuView: View {
                                     MenuCardView(card: card)
                                 }
                                 .buttonStyle(.plain)
-                                .disabled(card.requiresConnection && viewModel.plist == nil)
+                                .disabled(
+                                    (card.requiresConnection && viewModel.plist == nil)
+                                        || (card.destination == .reset && !viewModel.canRestoreOriginal)
+                                )
                             }
                         }
                     }
@@ -71,6 +76,8 @@ struct MenuView: View {
                     CategoryDetailView(category: category)
                 case .wallpapers:
                     WallpapersView()
+                case .reset:
+                    ResetDetailView()
                 }
             }
             .safeAreaInset(edge: .bottom) {
@@ -250,6 +257,71 @@ private struct DeviceNameDetailView: View {
         .background(Color.black)
         .navigationTitle("Nom de l'appareil")
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private struct ResetDetailView: View {
+    @EnvironmentObject private var viewModel: GestaltViewModel
+    @State private var showsConfirmation = false
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                Label(
+                    "Restaure com.apple.MobileGestalt.plist à l'état capturé par la toute première sauvegarde d'Island, avant la moindre modification, puis redémarre SpringBoard.",
+                    systemImage: "arrow.uturn.backward.circle.fill"
+                )
+                .font(.subheadline)
+                .foregroundStyle(.white)
+
+                Label(
+                    "Cela annule Dynamic Island, Apple Intelligence, le nom d'appareil et tous les autres réglages appliqués par Island. Les fonds d'écran installés via Pocket Poster ne sont pas concernés.",
+                    systemImage: "info.circle"
+                )
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.6))
+
+                if !viewModel.canRestoreOriginal {
+                    Label(
+                        "Aucune sauvegarde disponible : Island n'a encore rien modifié sur cet appareil.",
+                        systemImage: "checkmark.circle"
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.6))
+                }
+            }
+            .padding(18)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .padding(20)
+
+            Button(role: .destructive) {
+                showsConfirmation = true
+            } label: {
+                Text("Tout réinitialiser")
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.glassProminent)
+            .tint(.red)
+            .disabled(!viewModel.canRestoreOriginal || viewModel.isBusy)
+            .padding(.horizontal, 20)
+        }
+        .background(Color.black)
+        .navigationTitle("Réinitialiser")
+        .navigationBarTitleDisplayMode(.inline)
+        .confirmationDialog(
+            "Réinitialiser Island ?",
+            isPresented: $showsConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Tout réinitialiser", role: .destructive) {
+                viewModel.restoreOriginalPlist()
+            }
+            Button("Annuler", role: .cancel) {}
+        } message: {
+            Text("Toutes les modifications appliquées par Island seront annulées et SpringBoard va redémarrer.")
+        }
     }
 }
 

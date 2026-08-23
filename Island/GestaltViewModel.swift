@@ -13,12 +13,19 @@ final class GestaltViewModel: ObservableObject {
     @Published var modelName = ""
     @Published var stagesAIRegion = false
     @Published private(set) var isRespringing = false
+    @Published private(set) var backups: [GestaltBackup] = []
 
     private let access = GestaltAccess.shared()
 
     var aiRegionProfile: AIRegionProfile? {
         plist.flatMap(AIRegionProfile.init(plist:))
     }
+
+    var canRestoreOriginal: Bool { !backups.isEmpty }
+
+    /// The very first backup taken, i.e. the plist as it was before Island
+    /// ever wrote to it.
+    private var earliestBackup: GestaltBackup? { backups.last }
 
     var requiresForcedAIEnable: Bool {
         plist != nil && aiRegionProfile == nil
@@ -54,6 +61,56 @@ final class GestaltViewModel: ObservableObject {
         } catch {
             plist = nil
             report(error)
+        }
+        refreshBackups()
+    }
+
+    func refreshBackups() {
+        backups = (try? GestaltBackupStore.list()) ?? []
+    }
+
+    /// Restores `com.apple.MobileGestalt.plist` to the state captured by the
+    /// earliest backup on record, i.e. before Island made any change to it,
+    /// then respring's. This undoes every Island tweak in one step; it does
+    /// not touch wallpapers installed through Pocket Poster, since Island
+    /// never writes that data itself.
+    func restoreOriginalPlist() {
+        guard !isBusy, let earliestBackup else { return }
+        isBusy = true
+        notice = nil
+
+        do {
+            try access.connect()
+            let originalData = try access.readGestaltData()
+            _ = try GestaltBackupStore.create(from: originalData)
+
+            let backupData = try GestaltBackupStore.data(for: earliestBackup)
+            guard let restoredDict = try PropertyListSerialization.propertyList(
+                from: backupData,
+                options: [],
+                format: nil
+            ) as? [String: Any] else {
+                throw IslandError.invalidPlist
+            }
+
+            try access.saveGestalt(restoredDict)
+            guard let verification = try access.readGestalt() as? [String: Any] else {
+                throw IslandError.invalidPlist
+            }
+            plist = GestaltPlist(dict: verification)
+
+            selectedTweaks.removeAll()
+            dynamicIslandSubtype = nil
+            changesModelName = false
+            modelName = ""
+            stagesAIRegion = false
+
+            refreshBackups()
+            isBusy = false
+            isRespringing = true
+        } catch {
+            report(error)
+            isBusy = false
         }
     }
 
@@ -160,6 +217,7 @@ final class GestaltViewModel: ObservableObject {
 
             plist = verifiedPlist
             completion?()
+            refreshBackups()
             isBusy = false
             isRespringing = true
         } catch {
