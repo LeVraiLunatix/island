@@ -44,9 +44,11 @@ This is a fork of [GestaltEdit](https://github.com/frs0n/GestaltEdit) restyled a
 
 ## Requirements
 
-- iOS / iPadOS 27 beta 1–4 only (the `bad_query` path traversal this app relies on was patched after beta 4)
-- Developer Mode enabled
-- A signing tool such as [iLoader](https://github.com/nab138/iloader)
+- iOS / iPadOS **27 beta 1–4** via le backend `bad_query` (route historique), **ou**
+- iOS / iPadOS **27.0.1 et ultérieur** via le backend Pocket Poster (route Mobile Backup) — installer [Pocket Poster](https://cowabun.ga) une seule fois sur le device
+- Developer Mode activé
+- Un outil de signature tel que [iLoader](https://github.com/nab138/iloader)
+
 
 ## Install
 

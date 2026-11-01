@@ -28,3 +28,8 @@ Local.xcconfig
 .idea/
 .vscode/
 *.swp
+
+# Patch install artifacts
+patch-payload/
+apply-island-patch.ps1
+README-PATCH.md
