@@ -1,18 +1,18 @@
 import Foundation
 import UIKit
 
-enum ExploitBackend: String {
-    case badQuery
-    case nuggetBackup
+/// Détecte la version iOS et dit si le Nugget/PocketPoster backend s'applique.
+/// Ne touche PAS au backend historique du fork (bad_query path), qui reste
+/// la route par défaut sur beta 1-4 via le code existant.
+enum IslandBackend: String {
+    case legacyBadQuery   // code existant du fork, pour beta 1-4
+    case nuggetBackup     // route Pocket Poster, pour 27.0.1+
     case unsupported
 }
 
 struct VersionRouter {
     private static let beta1to4BuildPrefixes = [
-        "23A5257",
-        "23A5267",
-        "23A5276",
-        "23A5287"
+        "23A5257", "23A5267", "23A5276", "23A5287"
     ]
 
     static func currentBuild() -> String {
@@ -28,41 +28,31 @@ struct VersionRouter {
         return beta1to4BuildPrefixes.contains { b.hasPrefix($0) }
     }
 
-    static func systemVersionComponents() -> (Int, Int, Int) {
+    static func systemMajor() -> Int {
         let v = UIDevice.current.systemVersion
-        let parts = v.split(separator: ".").compactMap { Int($0) }
-        let major = parts.count > 0 ? parts[0] : 0
-        let minor = parts.count > 1 ? parts[1] : 0
-        let patch = parts.count > 2 ? parts[2] : 0
-        return (major, minor, patch)
+        return Int(v.split(separator: ".").first.map(String.init) ?? "0") ?? 0
     }
 
-    static func pick() -> ExploitBackend {
-        let (major, _, _) = systemVersionComponents()
-        guard major == 27 else { return .unsupported }
-
-        if isBeta1to4Build() {
-            let w = BadQueryWriter()
-            return w.isAvailable() ? .badQuery : .nuggetBackup
-        }
-
-        let w = NuggetBackupWriter()
-        return w.isAvailable() ? .nuggetBackup : .unsupported
+    static func pick() -> IslandBackend {
+        guard systemMajor() == 27 else { return .unsupported }
+        if isBeta1to4Build() { return .legacyBadQuery }
+        return .nuggetBackup
     }
 
-    static func writer() -> GestaltWriter? {
+    static func nuggetWriter() -> GestaltWriter {
+        return NuggetBackupWriter()
+    }
+
+    static func humanLabel() -> String {
         switch pick() {
-        case .badQuery:     return BadQueryWriter()
-        case .nuggetBackup: return NuggetBackupWriter()
-        case .unsupported:  return nil
+        case .legacyBadQuery: return "bad_query (iOS 27 beta 1-4)"
+        case .nuggetBackup:   return "Pocket Poster (iOS 27.0.1+)"
+        case .unsupported:    return "Non supporté"
         }
     }
 
-    static func humanBackendLabel() -> String {
-        switch pick() {
-        case .badQuery:     return "bad_query (iOS 27 beta 1-4)"
-        case .nuggetBackup: return "Pocket Poster bridge (iOS 27.0.1+)"
-        case .unsupported:  return "Non supporté"
-        }
+    static func pocketPosterInstalled() -> Bool {
+        guard let u = URL(string: "pocketposter://") else { return false }
+        return UIApplication.shared.canOpenURL(u)
     }
 }
