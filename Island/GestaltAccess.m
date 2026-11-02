@@ -98,7 +98,9 @@ static BOOL GestaltWriteAll(int fd, NSData *data)
         [build isEqualToString:@"24A5380h"] || // iOS / iPadOS 27 beta 3
         [build isEqualToString:@"24A5380i"] || // iPadOS 27 beta 3 v2
         [build isEqualToString:@"24A5380l"] || // iOS / iPadOS 27 Public Beta 1 (revised beta 3, see issue #51)
-        [build isEqualToString:@"24A5390f"]    // iOS / iPadOS 27 beta 4
+        [build isEqualToString:@"24A5390f"] || // iOS / iPadOS 27 beta 4
+        // 27.0.1+ : route Pocket Poster (NuggetBackupWriter)
+        version.minorVersion > 0 || version.patchVersion > 0
     );
 }
 
