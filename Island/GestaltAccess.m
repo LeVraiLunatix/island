@@ -113,6 +113,22 @@ static BOOL GestaltWriteAll(int fd, NSData *data)
             @"GestaltEdit currently supports only iOS and iPadOS 27 beta 1 through beta 4.", nil));
         return NO;
     }
+    // 27.0.1+ : court-circuit, route Pocket Poster (NuggetBackupWriter)
+    NSOperatingSystemVersion v = NSProcessInfo.processInfo.operatingSystemVersion;
+    if (v.majorVersion == 27 && (v.minorVersion > 0 || v.patchVersion > 0)) {
+        self.isConnected = YES;
+        self.plistPath = [kMobileGestaltCacheDirectory stringByAppendingPathComponent:kGestaltPlistFileName];
+        if (error) *error = nil;
+        return YES;
+    }
+    // 27.0.1+ : court-circuit, route Pocket Poster (NuggetBackupWriter)
+    NSOperatingSystemVersion v = NSProcessInfo.processInfo.operatingSystemVersion;
+    if (v.majorVersion == 27 && (v.minorVersion > 0 || v.patchVersion > 0)) {
+        self.isConnected = YES;
+        self.plistPath = [kMobileGestaltCacheDirectory stringByAppendingPathComponent:kGestaltPlistFileName];
+        if (error) *error = nil;
+        return YES;
+    }
 
     if (self.isConnected && _activeBadQueryLease.isActive &&
         self.plistPath.length > 0) {
